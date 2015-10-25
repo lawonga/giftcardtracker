@@ -14,7 +14,7 @@
             android:name=".MainViewActivity"
             android:label="@string/app_name" >
         </activity>
-        <activity android:name=".MainActivity"
+        <activity android:name=".LogonActivity"
             android:label="@string/app_name"
             >
             <intent-filter>

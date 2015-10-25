@@ -21,11 +21,14 @@ import android.widget.ListView;
 import com.parse.ParseUser;
 
 public class MainViewActivity extends AppCompatActivity {
+    // Register things
+    public static boolean active = false;
     private String[] mTitle;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private FrameLayout centerFrame;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,12 +38,11 @@ public class MainViewActivity extends AppCompatActivity {
         centerFrame = (FrameLayout)findViewById(R.id.container);
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
-        getSupportFragmentManager().beginTransaction().add(R.id.container, new CardList()).commit();
-        CardDataBase.queryList();
-        // centerFrame.setLongClickable(true);
+
+        if (!active) getSupportFragmentManager().beginTransaction().add(R.id.container, new CardListCreator()).commit();
 
         // Set the Adapter for list View
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mTitle));
+        mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, mTitle));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         getSupportActionBar().setTitle(mTitle[0]);
         mDrawerToggle = new ActionBarDrawerToggle(this,
@@ -60,8 +62,6 @@ public class MainViewActivity extends AppCompatActivity {
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-
     }
 
     @Override
@@ -76,33 +76,24 @@ public class MainViewActivity extends AppCompatActivity {
         int id = item.getItemId();
         if(id == R.id.action_add){
             showEditDialog();
-            CardList.notifychangeddata();
+            CardListCreator.notifychangeddata();
         }
         if(id == R.id.logout){
-            CardDataBase.clearList();
-            CardList.clearadapter();
-            CardDataBase.queryList();
+            CardListCreator.clearadapter();
+            CardListAdapter.queryList();
             ParseUser.logOut();
             this.finish();
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, LogonActivity.class);
             startActivity(intent);
         }
         return true;
     }
-
 
     // SHOW DIALOG from NEWCARD
     public void showEditDialog(){
         FragmentManager fm = getFragmentManager();
         NewCardFragment newcard = new NewCardFragment();
         newcard.show(fm, "new_card");
-    }
-
-    // After back button is pressed, clear list, clear adapter and query a new list to fully refresh the main list
-    public static void afterBackPressed(){
-        CardDataBase.clearList();
-        CardList.clearadapter();
-        CardDataBase.queryList();
     }
 
     @Override
@@ -154,5 +145,24 @@ public class MainViewActivity extends AppCompatActivity {
             getActivity().setTitle(title);
             return rootView;
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        active = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        CardListCreator.clearadapter();
+        active = false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        active = true;
     }
 }

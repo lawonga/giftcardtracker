@@ -36,8 +36,6 @@ public class NewCardFragment extends DialogFragment {
                 initialbalancetxt = initialbalance.getText().toString();
                 if(nametxt.equals("") || initialbalancetxt.equals("")){
                     Toast.makeText(v.getContext(),"Please fill in all fields", Toast.LENGTH_LONG).show();
-                } else if (CardDataBase.cardnamex.contains(nametxt)){
-                    Toast.makeText(v.getContext(),"Duplicate entry detected, please use a unique name", Toast.LENGTH_LONG).show();
                 } else {
                     ParseUser user = ParseUser.getCurrentUser();
                     ParseObject dbObject = new ParseObject("DataBase");
@@ -45,13 +43,9 @@ public class NewCardFragment extends DialogFragment {
                     dbObject.put("balance", initialbalancetxt);
                     dbObject.put("user", user);
                     dbObject.saveInBackground();
-                /*CardDataBase.cardnamex.add(nametxt);
-                CardDataBase.cardbalancex.add(Double.valueOf(initialbalancetxt));
-                CardDataBase.carddatas.add(new CardDataBase(nametxt, Double.valueOf(initialbalancetxt)));*/
                     dismiss();
-                    CardDataBase.clearList();
-                    CardList.clearadapter();
-                    CardDataBase.queryList();
+                    CardListCreator.clearadapter();
+                    CardListAdapter.queryList();
                 }
             }
         });

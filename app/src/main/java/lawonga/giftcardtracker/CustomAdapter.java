@@ -12,14 +12,14 @@ import java.util.ArrayList;
 /**
  * Created by lawonga on 9/27/2015.
  */
-public class CustomAdapter extends ArrayAdapter<CardDataBase> {
-    public CustomAdapter(Context context, ArrayList<CardDataBase> cardDatas) {
+public class CustomAdapter extends ArrayAdapter<CardListAdapter> {
+    public CustomAdapter(Context context, ArrayList<CardListAdapter> cardDatas) {
         super(context, 0, cardDatas);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        CardDataBase carddatas = getItem(position);
+        CardListAdapter carddatas = getItem(position);
         if(convertView==null){
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.card_list, parent, false);
         }

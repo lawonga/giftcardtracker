@@ -17,7 +17,7 @@ import com.parse.ParseUser;
  * Created by lawonga on 9/28/2015.
  * This is the main login screen, with USER & PASSWORD as well as a forgot password and register button
  */
-public class MainActivity extends AppCompatActivity {
+public class LogonActivity extends AppCompatActivity {
 
     // Register things
     String passwordtxt, usernametxt;
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void done(ParseUser parseUser, ParseException e) {
                         if (parseUser != null){
-                            Intent intent = new Intent(MainActivity.this, MainViewActivity.class);
+                            Intent intent = new Intent(LogonActivity.this, MainViewActivity.class);
                             startActivity(intent);
                             finish();
                         } else {
@@ -73,4 +73,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, RegisterScreen.class);
         startActivity(intent);
     }
+
+
 }
