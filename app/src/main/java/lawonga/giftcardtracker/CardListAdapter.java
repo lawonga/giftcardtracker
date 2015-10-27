@@ -1,13 +1,21 @@
 package lawonga.giftcardtracker;
 
 
+import android.util.Log;
+
 import com.parse.FindCallback;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lawonga on 9/27/2015.
@@ -33,13 +41,33 @@ public class CardListAdapter {
     }
 
     public static void queryList(){
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("userId", ParseUser.getCurrentUser());
+        map.put("poopId", "poop");
+        ParseCloud.callFunctionInBackground("retrievecard", map, new FunctionCallback<List<ParseObject>>() {
+            @Override
+            public void done(List<ParseObject> parseObjects, ParseException e) {
+                for (ParseObject object : parseObjects){
+                    String cardnameobject, objectID, cardnamebalance;
+                    cardnameobject = object.getString("cardname");
+                    cardnamebalance = object.getString("cardbalance");
+                    objectID = object.getObjectId();
+                    Log.e("Retrieved", cardnameobject + cardnamebalance + objectID);
+                    CardListCreator.cardData.add(new CardListAdapter(cardnameobject, Double.valueOf(cardnamebalance), objectID));
+                }
+            }
+        });
+
+
+        /*********************************/
+        /*
         ParseUser user = ParseUser.getCurrentUser();
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("DataBase");
         query.whereEqualTo("user", user);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objectList, ParseException e) {
-                String cardnameobject = "", objectID = "";
+                String cardnameobject, objectID;
                 Double cardnamebalance;
                 if (e == null) {
                     for (ParseObject object : objectList) {
@@ -54,5 +82,6 @@ public class CardListAdapter {
                 }
             }
         });
+        */
     }
 }
