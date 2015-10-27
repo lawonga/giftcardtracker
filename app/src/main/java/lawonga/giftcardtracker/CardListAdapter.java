@@ -39,13 +39,14 @@ public class CardListAdapter {
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objectList, ParseException e) {
-                String cardnameobject = "", cardnamebalance = "", objectID = "";
+                String cardnameobject = "", objectID = "";
+                Double cardnamebalance;
                 if (e == null) {
                     for (ParseObject object : objectList) {
                         cardnameobject = object.getString("cardname");
-                        cardnamebalance = object.getString("balance");
-                        objectID = object.getString("objectID");
-                        CardListCreator.cardData.add(new CardListAdapter(cardnameobject, Double.valueOf(cardnamebalance), objectID));
+                        cardnamebalance = object.getDouble("balance");
+                        objectID = object.getObjectId();
+                        CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, objectID));
                     }
                     CardListCreator.notifychangeddata();
                 } else {

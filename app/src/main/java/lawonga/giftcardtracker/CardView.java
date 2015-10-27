@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,13 +29,15 @@ public class CardView extends AppCompatActivity {
     String cardname, cardId;
     int cardposition;
     double cardbalance;
-    private TextView cardnameview, cardbalanceview;
+    private TextView cardnameview;
+    public static TextView cardbalanceview;
     private EditText cardnotes;
     private Button cardadd, cardsubtract;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainViewActivity.active = false;
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.card_layout);
@@ -63,15 +66,18 @@ public class CardView extends AppCompatActivity {
         bundle.putString("cardname", cardname);
         bundle.putDouble("cardbalance", cardbalance);
         bundle.putString("cardId", cardId);
+        Log.e("CardId is:", cardId);
+
+        // Set the values for below
+        final FragmentManager modify_card_fm = getFragmentManager();
+        final ModifyCardFragment modify_card = new ModifyCardFragment();
+        modify_card.setArguments(bundle);
 
         // Set action for adding money
         cardadd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 bundle.putBoolean("add_or_subtract", true);
-                FragmentManager modify_card_fm = getFragmentManager();
-                ModifyCardFragment modify_card = new ModifyCardFragment();
-                modify_card.setArguments(bundle);
                 modify_card.show(modify_card_fm, "modify_card");
             }
         });
@@ -81,9 +87,6 @@ public class CardView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 bundle.putBoolean("add_or_subtract", false);
-                FragmentManager modify_card_fm = getFragmentManager();
-                ModifyCardFragment modify_card = new ModifyCardFragment();
-                modify_card.setArguments(bundle);
                 modify_card.show(modify_card_fm, "modify_card");
             }
         });
@@ -133,7 +136,4 @@ public class CardView extends AppCompatActivity {
         inflater.inflate(R.menu.cardview, menu);
         return true;
     }
-
-
-
 }

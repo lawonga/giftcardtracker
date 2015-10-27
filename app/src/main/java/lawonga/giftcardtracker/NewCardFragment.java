@@ -19,7 +19,8 @@ import com.parse.ParseUser;
 public class NewCardFragment extends DialogFragment {
     EditText name, initialbalance;
     Button OK, cancel;
-    String nametxt, initialbalancetxt;
+    String nametxt;
+    Float initialbalancetxt;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -33,7 +34,7 @@ public class NewCardFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 nametxt = name.getText().toString();
-                initialbalancetxt = initialbalance.getText().toString();
+                initialbalancetxt = Float.valueOf(initialbalance.getText().toString());
                 if(nametxt.equals("") || initialbalancetxt.equals("")){
                     Toast.makeText(v.getContext(),"Please fill in all fields", Toast.LENGTH_LONG).show();
                 } else {

@@ -40,6 +40,7 @@ public class MainViewActivity extends AppCompatActivity {
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
         if (!active) getSupportFragmentManager().beginTransaction().add(R.id.container, new CardListCreator()).commit();
+        active = true;
 
         // Set the Adapter for list View
         mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, mTitle));
@@ -146,7 +147,6 @@ public class MainViewActivity extends AppCompatActivity {
             return rootView;
         }
     }
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -161,8 +161,17 @@ public class MainViewActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (!active) getSupportFragmentManager().beginTransaction().add(R.id.container, new CardListCreator()).commit();
+        active = true;
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
         active = true;
     }
+
+
 }
