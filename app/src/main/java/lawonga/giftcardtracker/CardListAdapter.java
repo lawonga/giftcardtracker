@@ -42,13 +42,14 @@ public class CardListAdapter {
 
     public static void queryList(){
         Map<String, Object> map = new HashMap<>(2);
-        map.put("userId", ParseUser.getCurrentUser());
+        map.put("userId", ParseUser.getCurrentUser().getObjectId());
         map.put("poopId", "poop");
         ParseCloud.callFunctionInBackground("retrievecard", map, new FunctionCallback<ArrayList<ParseObject>>() {
             @Override
             public void done(ArrayList<ParseObject> parseObjects, ParseException e) {
                 if (e==null){
-                    Log.e("ParseObject", "Success");
+                    Log.e("Result", "Success");
+                    Log.e("ParseObject", parseObjects.toString());
                 } else {
                     Log.e("Error: ", e.toString());
                 }
