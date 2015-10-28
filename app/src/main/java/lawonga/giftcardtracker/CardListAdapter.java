@@ -44,18 +44,25 @@ public class CardListAdapter {
         Map<String, Object> map = new HashMap<>(2);
         map.put("userId", ParseUser.getCurrentUser());
         map.put("poopId", "poop");
-        ParseCloud.callFunctionInBackground("retrievecard", map, new FunctionCallback<List<ParseObject>>() {
+        ParseCloud.callFunctionInBackground("retrievecard", map, new FunctionCallback<ArrayList<ParseObject>>() {
             @Override
-            public void done(List<ParseObject> parseObjects, ParseException e) {
-                for (ParseObject object : parseObjects){
-                    String cardnameobject, objectID, cardnamebalance;
+            public void done(ArrayList<ParseObject> parseObjects, ParseException e) {
+                if (e==null){
+                    Log.e("ParseObject", "Success");
+                } else {
+                    Log.e("Error: ", e.toString());
+                }
+
+                /*for (ParseObject object : parseObjects){
+                    /*String cardnameobject, objectID, cardnamebalance;
                     cardnameobject = object.getString("cardname");
                     cardnamebalance = object.getString("cardbalance");
                     objectID = object.getObjectId();
                     Log.e("Retrieved", cardnameobject + cardnamebalance + objectID);
                     CardListCreator.cardData.add(new CardListAdapter(cardnameobject, Double.valueOf(cardnamebalance), objectID));
-                }
+                }*/
             }
+
         });
 
 
