@@ -1,55 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:theme="@style/AppTheme">
-<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:id="@+id/imageView"
-        android:layout_gravity="center_horizontal" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/card_name"
-        android:id="@+id/card_name"
-        android:layout_gravity="center_horizontal"
-        android:textSize="30dp"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/card_balance"
-        android:id="@+id/card_balance"
-        android:layout_gravity="center_horizontal"
-        android:textSize="25dp"/>
+    android:orientation="vertical"
+    android:theme="@style/AppTheme"
+    >
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center">
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        >
 
-        <Button
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:id="@+id/card_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Reload"
-            android:textSize="18dp"
-            android:id="@+id/card_add"/>
-        <Button
+            android:layout_gravity="center_horizontal"
+            android:text="@string/card_name"
+            android:textSize="30dp" />
+
+        <TextView
+            android:id="@+id/card_balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Spend"
-            android:textSize="22dp"
-            android:id="@+id/card_subtract"
-/>
+            android:layout_gravity="center_horizontal"
+            android:text="@string/card_balance"
+            android:textSize="25dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/card_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reload"
+                android:textSize="18dp" />
+
+            <Button
+                android:id="@+id/card_subtract"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Spend"
+                android:textSize="22dp" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/note_view"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:hint="Card Notes"
+            />
+        <TextView
+            android:id="@+id/note_history"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            />
     </LinearLayout>
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:id="@+id/note_view"
-        android:descendantFocusability="beforeDescendants"
-        android:focusableInTouchMode="true"/>
-</LinearLayout>
 </ScrollView>

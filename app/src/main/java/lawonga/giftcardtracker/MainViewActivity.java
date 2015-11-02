@@ -22,7 +22,6 @@ import com.parse.ParseUser;
 
 public class MainViewActivity extends AppCompatActivity {
     // Register things
-    public static boolean active = false;
     private String[] mTitle;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -39,8 +38,9 @@ public class MainViewActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-        if (!active) getSupportFragmentManager().beginTransaction().add(R.id.container, new CardListCreator()).commit();
-        active = true;
+        if (CardListCreator.cardData.isEmpty()) {
+            getSupportFragmentManager().beginTransaction().add(R.id.container, new CardListCreator()).commit();
+        }
 
         // Set the Adapter for list View
         mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, mTitle));
@@ -148,30 +148,8 @@ public class MainViewActivity extends AppCompatActivity {
         }
     }
     @Override
-    protected void onPause() {
-        super.onPause();
-        active = true;
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        CardListCreator.clearadapter();
-        active = false;
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (!active) getSupportFragmentManager().beginTransaction().add(R.id.container, new CardListCreator()).commit();
-        active = true;
-    }
-
-    @Override
     public void onBackPressed() {
         super.onBackPressed();
-        active = true;
+        CardListCreator.cardData.clear();
     }
-
-
 }

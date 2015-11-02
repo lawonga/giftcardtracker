@@ -19,6 +19,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -26,37 +27,40 @@ import java.util.List;
  * Created by lawonga on 9/27/2015.
  */
 public class CardView extends AppCompatActivity {
-    String cardname, cardId;
+    String cardname, cardId, cardNotes;
     int cardposition;
     double cardbalance;
     private TextView cardnameview;
     public static TextView cardbalanceview;
-    private EditText cardnotes;
+    private EditText cardnotesview;
     private Button cardadd, cardsubtract;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MainViewActivity.active = false;
+        // MainViewActivity.active = false;
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.card_layout);
 
-        cardnameview = (TextView)findViewById(R.id.card_name);
-        cardbalanceview = (TextView)findViewById(R.id.card_balance);
-        cardadd = (Button)findViewById(R.id.card_add);
-        cardsubtract = (Button)findViewById(R.id.card_subtract);
+        cardnameview = (TextView) findViewById(R.id.card_name);
+        cardbalanceview = (TextView) findViewById(R.id.card_balance);
+        cardnotesview = (EditText)findViewById(R.id.note_view);
+        cardadd = (Button) findViewById(R.id.card_add);
+        cardsubtract = (Button) findViewById(R.id.card_subtract);
 
-        //Get data from CardListCreator
+        // Get data from CardListCreator
         Intent intent = getIntent();
         cardId = intent.getStringExtra("cardId");
         cardposition = intent.getIntExtra("cardposition", -1);
         cardname = intent.getStringExtra("cardname");
+        cardNotes = intent.getStringExtra("cardnotes");
         cardbalance = intent.getDoubleExtra("cardbalance", cardbalance);
 
         // Sets the texts from data we just got
         cardnameview.setText(cardname);
         cardbalanceview.setText(Double.toString(cardbalance));
+        cardnotesview.setText(cardNotes);
 
         // Enables action bar & home button
         setTitle(cardname);
@@ -66,6 +70,8 @@ public class CardView extends AppCompatActivity {
         bundle.putString("cardname", cardname);
         bundle.putDouble("cardbalance", cardbalance);
         bundle.putString("cardId", cardId);
+        bundle.putString("cardnotes", cardNotes);
+        bundle.putInt("cardposition", cardposition);
         Log.e("CardId is:", cardId);
 
         // Set the values for below
@@ -95,7 +101,8 @@ public class CardView extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.delete){
+        Log.e("Current cards ", CardListCreator.cardData.toString());
+        if (id == R.id.delete) {
             // Delete card
             // Cloud Delete
             ParseUser user = ParseUser.getCurrentUser();
@@ -119,7 +126,6 @@ public class CardView extends AppCompatActivity {
             });
             CardListCreator.cardData.remove(cardposition);
             CardListCreator.adapter.notifyDataSetChanged();
-            // MainViewActivity.afterBackPressed();
             finish();
         }
         return false;
@@ -128,6 +134,27 @@ public class CardView extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        // Back press = execute savedata
+        savedata();
+    }
+
+    // Saves data to cloud (forcefully, without getting object first, using pointers)
+    public void savedata(){
+        ParseObject point = ParseObject.createWithoutData("DataBase", cardId);
+        point.put("cardnotes", cardnotesview.getText().toString());
+        point.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e==null){
+                    // Saved successfully
+                    Log.e("Save status ", "OK");
+                    CardListCreator.cardData.set(cardposition, new CardListAdapter(cardname, Double.valueOf(cardbalanceview.getText().toString()), cardnotesview.getText().toString(), cardId));
+                } else {
+                    Log.e("Save status ", e.toString());
+                }
+                CardListCreator.notifychangeddata();
+            }
+        });
     }
 
     @Override

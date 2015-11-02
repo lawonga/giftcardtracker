@@ -36,12 +36,14 @@ public class CardListCreator extends ListFragment {
     public void onListItemClick(final ListView l, View v, int position, long id) {
         String cardname = cardData.get(position).getCardName();
         Double cardbalance = cardData.get(position).getCardBalance();
+        String cardnotes = cardData.get(position).getCardNotes();
         String cardId = cardData.get(position).getObjectId();
         Intent intent = new Intent(v.getContext(), CardView.class);
+        intent.putExtra("cardposition", position);
         intent.putExtra("cardbalance", cardbalance);
         intent.putExtra("cardname", cardname);
         intent.putExtra("cardId", cardId);
-        intent.putExtra("cardposition", position);
+        intent.putExtra("cardnotes", cardnotes);
         startActivity(intent);
     }
 }

@@ -51,6 +51,7 @@ public class LogonActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                login.setEnabled(false);
                 usernametxt = username.getText().toString();
                 passwordtxt = password.getText().toString();
                 ParseUser.logInInBackground(usernametxt, passwordtxt, new LogInCallback() {
@@ -62,6 +63,7 @@ public class LogonActivity extends AppCompatActivity {
                             finish();
                         } else {
                             Toast.makeText(getApplicationContext(), "Sorry, your username or password is incorrect.", Toast.LENGTH_LONG).show();
+                            login.setEnabled(true);
                         }
                     }
                 });

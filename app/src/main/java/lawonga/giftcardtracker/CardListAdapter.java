@@ -21,13 +21,14 @@ import java.util.Map;
  * Created by lawonga on 9/27/2015.
  */
 public class CardListAdapter {
-    public String cardname, objectId;
+    public String cardname, cardnotes, objectId;
     public double cardbalance;
 
-    public CardListAdapter(String cardname, double cardbalance, String objectId){
+    public CardListAdapter(String cardname, double cardbalance, String cardnotes, String objectId){
         this.cardname = cardname;
         this.cardbalance = cardbalance;
         this.objectId = objectId;
+        this.cardnotes = cardnotes;
     }
 
     public String getCardName(){
@@ -39,56 +40,35 @@ public class CardListAdapter {
     public String getObjectId(){
         return objectId;
     }
+    public String getCardNotes() {
+        return cardnotes;
+    }
 
     public static void queryList(){
-        Map<String, Object> map = new HashMap<>(2);
-        map.put("userId", ParseUser.getCurrentUser());
-        map.put("poopId", "poop");
+        // Querys list from the cloudcode via retrievecard.js; retrieves all card
+
+        Map<String, Object> map = new HashMap<>(1);
+        map.put("userId", ParseUser.getCurrentUser().getObjectId());
         ParseCloud.callFunctionInBackground("retrievecard", map, new FunctionCallback<ArrayList<ParseObject>>() {
             @Override
             public void done(ArrayList<ParseObject> parseObjects, ParseException e) {
                 if (e==null){
-                    Log.e("ParseObject", "Success");
-                } else {
-                    Log.e("Error: ", e.toString());
-                }
-
-                /*for (ParseObject object : parseObjects){
-                    /*String cardnameobject, objectID, cardnamebalance;
-                    cardnameobject = object.getString("cardname");
-                    cardnamebalance = object.getString("cardbalance");
-                    objectID = object.getObjectId();
-                    Log.e("Retrieved", cardnameobject + cardnamebalance + objectID);
-                    CardListCreator.cardData.add(new CardListAdapter(cardnameobject, Double.valueOf(cardnamebalance), objectID));
-                }*/
-            }
-
-        });
-
-
-        /*********************************/
-        /*
-        ParseUser user = ParseUser.getCurrentUser();
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("DataBase");
-        query.whereEqualTo("user", user);
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objectList, ParseException e) {
-                String cardnameobject, objectID;
-                Double cardnamebalance;
-                if (e == null) {
-                    for (ParseObject object : objectList) {
+                    Log.e("ParseObject", parseObjects.toString());
+                    String cardnameobject, objectID, cardnotes;
+                    Double cardnamebalance;
+                    for (ParseObject object : parseObjects){
                         cardnameobject = object.getString("cardname");
                         cardnamebalance = object.getDouble("balance");
+                        cardnotes = object.getString("cardnotes");
                         objectID = object.getObjectId();
-                        CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, objectID));
+                        CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, cardnotes, objectID));
                     }
                     CardListCreator.notifychangeddata();
                 } else {
-                    CardListCreator.notifychangeddata();
+                    Log.e("Error ", e.toString());
                 }
             }
+
         });
-        */
     }
 }

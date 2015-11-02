@@ -24,8 +24,9 @@ import java.util.Map;
  */
 public class ModifyCardFragment extends DialogFragment {
     Boolean add_or_subtract;
-    String cardname, cardId;
-    Double cardvalue, finalcardmodifier;
+    String cardname, cardId, cardnotes;
+    Double cardvalue, finalcardmodifier, finalcardvalue;
+    int cardposition;
     TextView addorsubtract_textview;
     EditText addorsubtract_edittextview;
     Button addorsubctract_add, addorsubtract_cancel;
@@ -38,6 +39,9 @@ public class ModifyCardFragment extends DialogFragment {
         cardname = getArguments().getString("cardname");
         cardvalue = getArguments().getDouble("cardbalance");
         cardId = getArguments().getString("cardId");
+        cardposition = getArguments().getInt("cardposition");
+        cardnotes = getArguments().getString("cardnotes");
+
         Log.e("CardId equals", cardId);
         View view = inflater.inflate(R.layout.card_modify, container);
         // Initialize
@@ -48,11 +52,14 @@ public class ModifyCardFragment extends DialogFragment {
         addorsubctract_add.setOnClickListener(new View.OnClickListener() {
               @Override
               public void onClick(View v) {
+                  if (addorsubtract_edittextview.getText().toString().equals("")){
+                      addorsubtract_edittextview.setText("0");
+                  }
                   // Use add_or_subtract boolean value to determine whether to add or subtract; if true = add
-                  if (add_or_subtract){
+                  if (add_or_subtract) {
                       finalcardmodifier = Double.valueOf(addorsubtract_edittextview.getText().toString());
                   } else {
-                      finalcardmodifier = Double.valueOf(addorsubtract_edittextview.getText().toString())*-1;
+                      finalcardmodifier = Double.valueOf(addorsubtract_edittextview.getText().toString()) * -1;
                   }
                   Map<String, Object> map = new HashMap<>(2);
                   map.put("cardmodifier", finalcardmodifier);
@@ -60,13 +67,14 @@ public class ModifyCardFragment extends DialogFragment {
                   ParseCloud.callFunctionInBackground("modifycard", map, new FunctionCallback<String>() {
                       @Override
                       public void done(String s, ParseException e) {
-                          if (e == null){
-                              CardView.cardbalanceview.setText(String.valueOf(cardvalue+finalcardmodifier));
-                              dismiss();
+                          if (e == null) {
+                              finalcardvalue = cardvalue + finalcardmodifier;
+                              CardView.cardbalanceview.setText(String.valueOf(finalcardvalue));
                           } else {
                               Log.e("Error: ", e.toString());
                               Toast.makeText(getActivity(), "Unknown Error", Toast.LENGTH_LONG).show();
                           }
+                          dismiss();
                       }
                   });
               }
