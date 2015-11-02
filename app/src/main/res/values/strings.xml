@@ -20,4 +20,6 @@
     <string name="register_screen">Create your account</string>
     <string name="logout">Logout</string>
     <string name="delete">Delete</string>
+    <string name="archive">Archive</string>
+    <string name="unarchive">unarchive</string>
 </resources>

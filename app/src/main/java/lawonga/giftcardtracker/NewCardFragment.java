@@ -3,6 +3,7 @@ package lawonga.giftcardtracker;
 import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +11,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by lawonga on 9/28/2015.
@@ -19,8 +26,8 @@ import com.parse.ParseUser;
 public class NewCardFragment extends DialogFragment {
     EditText name, initialbalance;
     Button OK, cancel;
-    String nametxt;
-    Float initialbalancetxt;
+    static String nametxt;
+    static String initialbalancetxt;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -34,16 +41,11 @@ public class NewCardFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 nametxt = name.getText().toString();
-                initialbalancetxt = Float.valueOf(initialbalance.getText().toString());
+                initialbalancetxt = initialbalance.getText().toString();
                 if(nametxt.equals("") || initialbalancetxt.equals("")){
                     Toast.makeText(v.getContext(),"Please fill in all fields", Toast.LENGTH_LONG).show();
                 } else {
-                    ParseUser user = ParseUser.getCurrentUser();
-                    ParseObject dbObject = new ParseObject("DataBase");
-                    dbObject.put("cardname", nametxt);
-                    dbObject.put("balance", initialbalancetxt);
-                    dbObject.put("user", user);
-                    dbObject.saveInBackground();
+                    createCard(nametxt, initialbalancetxt, "DataBase", "");
                     dismiss();
                     CardListCreator.clearadapter();
                     CardListAdapter.queryList();
@@ -57,5 +59,19 @@ public class NewCardFragment extends DialogFragment {
             }
         });
         return view;
+    }
+
+    public static void createCard(String nametext, String initialbalancetext,  String databaseclass, String cardnotes){
+        Map<String, Object> map = new HashMap<>();
+        map.put("cardname", nametext);
+        map.put("balance", Double.valueOf(initialbalancetext));
+        map.put("database", databaseclass);
+        map.put("cardnotes", cardnotes);
+        ParseCloud.callFunctionInBackground("createcard", map, new FunctionCallback<String>() {
+            @Override
+            public void done(String s, ParseException e) {
+                // COMPLETE
+            }
+        });
     }
 }

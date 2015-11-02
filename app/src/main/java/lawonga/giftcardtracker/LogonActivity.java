@@ -24,11 +24,13 @@ public class LogonActivity extends AppCompatActivity {
     TextView registerhere;
     EditText username, password;
     Button login, forgotpassword;
-
+    public static int currentcard;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new ParseInitialization();
+        currentcard = 0;
+
         setContentView(R.layout.login_screen);
 
         // Import buttons, textviews, edittexts...

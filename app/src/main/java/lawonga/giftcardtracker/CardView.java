@@ -13,15 +13,20 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lawonga on 9/27/2015.
@@ -36,6 +41,25 @@ public class CardView extends AppCompatActivity {
     private Button cardadd, cardsubtract;
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // Checks to see if we're in archived cards or my cards
+        MenuItem archiveMenu = menu.findItem(R.id.archive);
+        MenuItem unarchiveMenu = menu.findItem(R.id.unarchive);
+        if (LogonActivity.currentcard == 1) {
+            archiveMenu.setVisible(false);
+            archiveMenu.setEnabled(false);
+            unarchiveMenu.setVisible(true);
+            unarchiveMenu.setEnabled(true);
+        } else {
+            archiveMenu.setVisible(true);
+            archiveMenu.setEnabled(true);
+            unarchiveMenu.setVisible(false);
+            unarchiveMenu.setEnabled(false);
+        }
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // MainViewActivity.active = false;
@@ -43,6 +67,7 @@ public class CardView extends AppCompatActivity {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.card_layout);
 
+        // Initialize stuff
         cardnameview = (TextView) findViewById(R.id.card_name);
         cardbalanceview = (TextView) findViewById(R.id.card_balance);
         cardnotesview = (EditText)findViewById(R.id.note_view);
@@ -102,33 +127,41 @@ public class CardView extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         Log.e("Current cards ", CardListCreator.cardData.toString());
+        String nametxt = cardname;
+        String initialbalancetxt =  String.valueOf(cardbalance);
         if (id == R.id.delete) {
-            // Delete card
-            // Cloud Delete
-            ParseUser user = ParseUser.getCurrentUser();
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("DataBase");
-            query.whereEqualTo("user", user);
-            query.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(List<ParseObject> list, ParseException e) {
-                    for (ParseObject object : list) {
-                        String cardnameobject = object.getString("cardname");
-                        if (cardname.equals(cardnameobject)) {
-                            try {
-                                object.delete();
-                            } catch (ParseException e1) {
-                                object.deleteInBackground();
-                                e1.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            });
-            CardListCreator.cardData.remove(cardposition);
-            CardListCreator.adapter.notifyDataSetChanged();
-            finish();
+            deleteCurrentCard();
+            Toast.makeText(getApplication(), "Card Deleted", Toast.LENGTH_LONG).show();
+        } else if (id == R.id.archive){
+            // Create card in archive + delete card in cloud
+            NewCardFragment.createCard(nametxt, initialbalancetxt, "Archive", cardNotes);
+            deleteCurrentCard();
+            Toast.makeText(getApplication(), "Card Archived", Toast.LENGTH_LONG).show();
+        } else if (id == R.id.unarchive){
+            NewCardFragment.createCard(nametxt, initialbalancetxt, "DataBase", cardNotes);
+            deleteCurrentCard();
+            Toast.makeText(getApplication(), "Card Unarchived", Toast.LENGTH_LONG).show();
         }
+
         return false;
+    }
+
+    public void deleteCurrentCard(){
+        // Delete card in cloud
+        Map<String, Object> map = new HashMap<>();
+        map.put("currentCard", LogonActivity.currentcard);
+        map.put("cardId", cardId);
+        // map.put("userId", ParseUser.getCurrentUser().getObjectId());
+        ParseCloud.callFunctionInBackground("deletecard", map, new FunctionCallback<String>() {
+            @Override
+            public void done(String s, ParseException e) {
+                if (e != null) Log.e("Error ", e.toString());
+                else Log.e("Success", "aw ye");
+            }
+        });
+        CardListCreator.cardData.remove(cardposition);
+        CardListCreator.adapter.notifyDataSetChanged();
+        finish();
     }
 
     @Override

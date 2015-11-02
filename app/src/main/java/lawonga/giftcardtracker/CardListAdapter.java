@@ -47,8 +47,9 @@ public class CardListAdapter {
     public static void queryList(){
         // Querys list from the cloudcode via retrievecard.js; retrieves all card
 
-        Map<String, Object> map = new HashMap<>(1);
+        Map<String, Object> map = new HashMap<>(2);
         map.put("userId", ParseUser.getCurrentUser().getObjectId());
+        map.put("currentCard", LogonActivity.currentcard);
         ParseCloud.callFunctionInBackground("retrievecard", map, new FunctionCallback<ArrayList<ParseObject>>() {
             @Override
             public void done(ArrayList<ParseObject> parseObjects, ParseException e) {

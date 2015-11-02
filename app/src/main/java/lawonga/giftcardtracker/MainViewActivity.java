@@ -38,14 +38,13 @@ public class MainViewActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-        if (CardListCreator.cardData.isEmpty()) {
-            getSupportFragmentManager().beginTransaction().add(R.id.container, new CardListCreator()).commit();
-        }
-
         // Set the Adapter for list View
         mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, mTitle));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-        getSupportActionBar().setTitle(mTitle[0]);
+        mDrawerList.setItemChecked(0, true);
+        if (CardListCreator.cardData.isEmpty()) {
+            getSupportFragmentManager().beginTransaction().add(R.id.container, new CardListCreator()).commit();
+        }
         mDrawerToggle = new ActionBarDrawerToggle(this,
                 mDrawerLayout,
                 R.drawable.ic_drawer,
@@ -81,7 +80,6 @@ public class MainViewActivity extends AppCompatActivity {
         }
         if(id == R.id.logout){
             CardListCreator.clearadapter();
-            CardListAdapter.queryList();
             ParseUser.logOut();
             this.finish();
             Intent intent = new Intent(this, LogonActivity.class);
@@ -120,10 +118,13 @@ public class MainViewActivity extends AppCompatActivity {
         // Swaps fragments in the main content view
         private void selectItem(int position){
             // Create a new fragment and specify what view to show
-            Fragment fragment = new posFragment();
+            Fragment fragment;
+            fragment = new grabCard();
+            // args required to set the title and fragment; send position clicked
             Bundle args = new Bundle();
-            args.putInt(posFragment.ARG_FRAG_NO, position);
+            args.putInt(grabCard.ARG_FRAG_NO, position);
             fragment.setArguments(args);
+
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
             mDrawerList.setItemChecked(position, true);
@@ -132,21 +133,35 @@ public class MainViewActivity extends AppCompatActivity {
         }
 
     }
-    public static class posFragment extends android.app.Fragment{
+    public class grabCard extends android.app.Fragment{
         public static final String ARG_FRAG_NO = "frag_no";
 
-        public posFragment() {
+        public grabCard() {
             //EMPTY AS REQUIRED
         }
 
+        // If 0, access DataBase parse class. If 1, access Archive parse class. If 2, remove & access settings
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.card_list, container, false);
+            View rootView = inflater.inflate(R.layout.reuseable_fragment_layout, container, false);
             int i = getArguments().getInt(ARG_FRAG_NO);
             String title = getResources().getStringArray(R.array.titles)[i];
             getActivity().setTitle(title);
+            if (i==0) {
+                LogonActivity.currentcard = 0;
+            } else if (i==1){
+                LogonActivity.currentcard = 1;
+            } else {
+                LogonActivity.currentcard = 2;
+                centerFrame.removeAllViews();
+                return rootView;
+            }
+            CardListCreator.clearadapter();
+            centerFrame.removeAllViews();
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, new CardListCreator()).commit();
             return rootView;
         }
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
