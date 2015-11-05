@@ -16,6 +16,7 @@ import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +26,10 @@ import java.util.Map;
 public class ModifyCardFragment extends DialogFragment {
     Boolean add_or_subtract;
     String cardname, cardId, cardnotes;
-    Double cardvalue, finalcardmodifier, finalcardvalue;
+    Double cardvalue;
+    Double finalcardmodifier;
+    Double finalcardvalue;
+    Double roundedfinalcardvalue;
     int cardposition;
     TextView addorsubtract_textview;
     EditText addorsubtract_edittextview;
@@ -57,10 +61,11 @@ public class ModifyCardFragment extends DialogFragment {
                   }
                   // Use add_or_subtract boolean value to determine whether to add or subtract; if true = add
                   if (add_or_subtract) {
-                      finalcardmodifier = Double.valueOf(addorsubtract_edittextview.getText().toString());
+                      finalcardmodifier = Double.valueOf(Math.round(Double.valueOf(addorsubtract_edittextview.getText().toString())*100)/100);
                   } else {
-                      finalcardmodifier = Double.valueOf(addorsubtract_edittextview.getText().toString()) * -1;
+                      finalcardmodifier = Double.valueOf(Math.round(Double.valueOf(addorsubtract_edittextview.getText().toString())*-100)/100);
                   }
+                  addorsubctract_add.setEnabled(false);
                   Map<String, Object> map = new HashMap<>(2);
                   map.put("cardmodifier", finalcardmodifier);
                   map.put("cardId", cardId);
@@ -68,6 +73,7 @@ public class ModifyCardFragment extends DialogFragment {
                       @Override
                       public void done(String s, ParseException e) {
                           if (e == null) {
+                              cardvalue = Double.valueOf(CardView.cardbalanceview.getText().toString());
                               finalcardvalue = cardvalue + finalcardmodifier;
                               CardView.cardbalanceview.setText(String.valueOf(finalcardvalue));
                           } else {
