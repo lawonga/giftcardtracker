@@ -15,7 +15,7 @@ import com.parse.SignUpCallback;
 /**
  * Created by lawonga on 9/28/2015.
  */
-public class RegisterScreen extends Activity {
+public class NewUser extends Activity {
     // Initialization
     EditText name, username, email, password, passwordagain;
     Button registerbutton;

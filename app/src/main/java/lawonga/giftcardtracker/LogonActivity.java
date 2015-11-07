@@ -3,6 +3,7 @@ package lawonga.giftcardtracker;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,12 +26,22 @@ public class LogonActivity extends AppCompatActivity {
     EditText username, password;
     Button login, forgotpassword;
     public static int currentcard;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new ParseInitialization();
-        currentcard = 0;
 
+
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser != null){
+            Log.e("currentuser", currentUser.toString());
+            Intent intent = new Intent(LogonActivity.this, MainViewActivity.class);
+            startActivity(intent);
+            this.finish();
+        }
+
+        currentcard = 0;
         setContentView(R.layout.login_screen);
 
         // Import buttons, textviews, edittexts...
@@ -41,15 +52,16 @@ public class LogonActivity extends AppCompatActivity {
         forgotpassword = (Button)findViewById(R.id.forgot_password_button);
 
 
-        // REGISTER ONCLICK LISTENER
+        // This starts up the new user screen
         registerhere.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openRegisterScreen();
+                Intent intent = new Intent(getApplication(), NewUser.class);
+                startActivity(intent);
             }
         });
 
-        //LOGIN ONCLICK LISTENER
+        // This sets the login
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,11 +84,4 @@ public class LogonActivity extends AppCompatActivity {
             }
         });
     }
-
-    public void openRegisterScreen(){
-        Intent intent = new Intent(this, RegisterScreen.class);
-        startActivity(intent);
-    }
-
-
 }

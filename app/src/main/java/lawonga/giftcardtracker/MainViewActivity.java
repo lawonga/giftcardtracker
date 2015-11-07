@@ -1,12 +1,17 @@
 package lawonga.giftcardtracker;
 
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,10 +32,15 @@ public class MainViewActivity extends AppCompatActivity {
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private FrameLayout centerFrame;
+    // Register global network connectivity
+    public static boolean networkStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        networkStatus = isNetworkConnected();
+
         // Initialization
         setContentView(R.layout.activity_main);
         mTitle = getResources().getStringArray(R.array.titles);
@@ -42,9 +52,12 @@ public class MainViewActivity extends AppCompatActivity {
         mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, mTitle));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         mDrawerList.setItemChecked(0, true);
+
+        // This code CREATES the entire list
         if (CardListCreator.cardData.isEmpty()) {
             getSupportFragmentManager().beginTransaction().add(R.id.container, new CardListCreator()).commit();
         }
+
         mDrawerToggle = new ActionBarDrawerToggle(this,
                 mDrawerLayout,
                 R.drawable.ic_drawer,
@@ -81,9 +94,13 @@ public class MainViewActivity extends AppCompatActivity {
         if(id == R.id.logout){
             CardListCreator.clearadapter();
             ParseUser.logOut();
-            this.finish();
-            Intent intent = new Intent(this, LogonActivity.class);
-            startActivity(intent);
+            if (ParseUser.getCurrentUser() == null) {
+                Intent intent = new Intent(this, LogonActivity.class);
+                startActivity(intent);
+                finish();
+            } else {
+                Log.e("Logout" , "Failed");
+            }
         }
         return true;
     }
@@ -118,8 +135,7 @@ public class MainViewActivity extends AppCompatActivity {
         // Swaps fragments in the main content view
         private void selectItem(int position){
             // Create a new fragment and specify what view to show
-            Fragment fragment;
-            fragment = new grabCard();
+            Fragment fragment = new grabCard();
             // args required to set the title and fragment; send position clicked
             Bundle args = new Bundle();
             args.putInt(grabCard.ARG_FRAG_NO, position);
@@ -162,9 +178,18 @@ public class MainViewActivity extends AppCompatActivity {
         }
     }
 
+    // What happens when back button is pressed: open a new exit dialog fragment
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         CardListCreator.cardData.clear();
+        DialogFragment exitDialog = new ExitDialogFragment();
+        exitDialog.show(getFragmentManager(), "Exit_Dialog");
+    }
+
+    // Network state check
+    public boolean isNetworkConnected(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null;
     }
 }

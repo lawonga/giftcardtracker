@@ -17,12 +17,8 @@ public class ParseInitialization extends Application {
         // Parse Initialization
         // Enable Local Datastore.
         Parse.enableLocalDatastore(this);
-
         Parse.initialize(this, keys.key1, keys.key2);
-
-        ParseUser.enableAutomaticUser();
         ParseACL defaultACL = new ParseACL();
-
         defaultACL.setPublicReadAccess(true);
         ParseACL.setDefaultACL(defaultACL, true);
     }
