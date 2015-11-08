@@ -8,9 +8,12 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,10 +21,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ScrollView;
 
 import com.parse.ParseUser;
 
@@ -31,7 +36,8 @@ public class MainViewActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
-    private FrameLayout centerFrame;
+    private LinearLayout centerLayout;
+    public static SwipeRefreshLayout swipeRefreshLayout;
     // Register global network connectivity
     public static boolean networkStatus;
 
@@ -44,20 +50,44 @@ public class MainViewActivity extends AppCompatActivity {
         // Initialization
         setContentView(R.layout.activity_main);
         mTitle = getResources().getStringArray(R.array.titles);
-        centerFrame = (FrameLayout)findViewById(R.id.container);
+        centerLayout = (LinearLayout)findViewById(R.id.container);
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-
+        mDrawerList = (ListView)findViewById(R.id.left_drawer);
+        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.main_swipeContainer);
         // Set the Adapter for list View
         mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, mTitle));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         mDrawerList.setItemChecked(0, true);
 
-        // This code CREATES the entire list
+        // This code CREATES the entire list with CHECKS on network state
+        final CardListCreator cardListCreatorFragment = new CardListCreator();
         if (CardListCreator.cardData.isEmpty()) {
-            getSupportFragmentManager().beginTransaction().add(R.id.container, new CardListCreator()).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.container, cardListCreatorFragment).commit();
         }
+        getSupportFragmentManager().findFragmentById(R.id.container);
 
+        centerLayout.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                swipeRefreshLayout.setEnabled(false);
+                if (cardListCreatorFragment.getListView().getFirstVisiblePosition() == 0){
+                    swipeRefreshLayout.setEnabled(true);
+                    // Swipe to refresh code
+                    swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                        @Override
+                        public void onRefresh() {
+                            CardListCreator.clearadapter();
+                            CardListAdapter.queryList();
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+                }
+            }
+        });
+
+
+
+        // Nav drawer code
         mDrawerToggle = new ActionBarDrawerToggle(this,
                 mDrawerLayout,
                 R.drawable.ic_drawer,
@@ -168,11 +198,11 @@ public class MainViewActivity extends AppCompatActivity {
                 LogonActivity.currentcard = 1;
             } else {
                 LogonActivity.currentcard = 2;
-                centerFrame.removeAllViews();
+                centerLayout.removeAllViews();
                 return rootView;
             }
             CardListCreator.clearadapter();
-            centerFrame.removeAllViews();
+            centerLayout.removeAllViews();
             getSupportFragmentManager().beginTransaction().replace(R.id.container, new CardListCreator()).commit();
             return rootView;
         }

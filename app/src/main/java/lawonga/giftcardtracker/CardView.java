@@ -1,7 +1,10 @@
 package lawonga.giftcardtracker;
 
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -17,6 +20,7 @@ import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.FunctionCallback;
+import com.parse.GetCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -151,17 +155,33 @@ public class CardView extends AppCompatActivity {
         Map<String, Object> map = new HashMap<>();
         map.put("currentCard", LogonActivity.currentcard);
         map.put("cardId", cardId);
-        // map.put("userId", ParseUser.getCurrentUser().getObjectId());
-        ParseCloud.callFunctionInBackground("deletecard", map, new FunctionCallback<String>() {
-            @Override
-            public void done(String s, ParseException e) {
-                if (e != null) Log.e("Error ", e.toString());
-                else Log.e("Success", "aw ye");
-            }
-        });
-        CardListCreator.cardData.remove(cardposition);
-        CardListCreator.adapter.notifyDataSetChanged();
-        finish();
+
+        if (isNetworkConnected()) {
+            ParseCloud.callFunctionInBackground("deletecard", map, new FunctionCallback<String>() {
+                @Override
+                public void done(String s, ParseException e) {
+                    if (e != null) Log.e("Error ", e.toString());
+                    else Log.e("Success", "aw ye");
+                }
+            });
+            CardListCreator.cardData.remove(cardposition);
+            CardListCreator.adapter.notifyDataSetChanged();
+            finish();
+        } else {
+            ParseObject object = ParseObject.createWithoutData("DataBase", cardId);
+            object.fetchFromLocalDatastoreInBackground(new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject parseObject, ParseException e) {
+                    if (e==null){
+                        parseObject.deleteEventually();
+                        Log.e("Offline", "Save Successful");
+                    } else {
+                        Log.e("Offline", "Save failed");
+                    }
+                }
+            });
+
+        }
     }
 
     @Override
@@ -175,19 +195,9 @@ public class CardView extends AppCompatActivity {
     public void savedata(){
         ParseObject point = ParseObject.createWithoutData("DataBase", cardId);
         point.put("cardnotes", cardnotesview.getText().toString());
-        point.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e==null){
-                    // Saved successfully
-                    Log.e("Save status ", "OK");
-                    CardListCreator.cardData.set(cardposition, new CardListAdapter(cardname, Double.valueOf(cardbalanceview.getText().toString()), cardnotesview.getText().toString(), cardId));
-                } else {
-                    Log.e("Save status ", e.toString());
-                }
-                CardListCreator.notifychangeddata();
-            }
-        });
+        point.saveEventually();
+        CardListCreator.cardData.set(cardposition, new CardListAdapter(cardname, Double.valueOf(cardbalanceview.getText().toString()), cardnotesview.getText().toString(), cardId));
+        CardListCreator.notifychangeddata();
     }
 
     @Override
@@ -195,5 +205,12 @@ public class CardView extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.cardview, menu);
         return true;
+    }
+
+    // Network state check
+    public boolean isNetworkConnected(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null;
     }
 }

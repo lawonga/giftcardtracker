@@ -56,6 +56,15 @@ public class CardListAdapter {
                 public void done(ArrayList<ParseObject> parseObjects, ParseException e) {
                     if (e == null) {
                         Log.e("ParseObject", parseObjects.toString());
+                        // Unpins all as to avoid duplicates
+                        try {
+                            ParseObject.unpinAll();
+                            Log.e("Unpin Objects", "success");
+                        } catch (ParseException e1) {
+                            e1.printStackTrace();
+                            Log.e("Unpin Objects", e1.toString());
+                        }
+                        // Grabs data from parsecloud
                         for (final ParseObject object : parseObjects) {
                             // PER card has different data, hence why these are placed in here
                             String cardnameobject, objectID, currentCardNotes;
@@ -65,7 +74,9 @@ public class CardListAdapter {
                             currentCardNotes = object.getString("cardnotes");
                             objectID = object.getObjectId();
                             CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID));
+                            CardListCreator.notifychangeddata();
                         }
+                        // Repins the updated data
                         ParseObject.pinAllInBackground(PINNED_CARD, parseObjects);
                         CardListCreator.notifychangeddata();
                     } else {
@@ -90,6 +101,7 @@ public class CardListAdapter {
                             cardnamebalance = object.getDouble("balance");
                             objectID = object.getObjectId();
                             CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID));
+                            CardListCreator.notifychangeddata();
                             Log.e("Local Datastore", objectID);
                         }
                     } else {

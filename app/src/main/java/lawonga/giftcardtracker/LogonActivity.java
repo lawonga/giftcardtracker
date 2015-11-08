@@ -1,6 +1,9 @@
 package lawonga.giftcardtracker;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -65,22 +68,28 @@ public class LogonActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                login.setEnabled(false);
-                usernametxt = username.getText().toString();
-                passwordtxt = password.getText().toString();
-                ParseUser.logInInBackground(usernametxt, passwordtxt, new LogInCallback() {
-                    @Override
-                    public void done(ParseUser parseUser, ParseException e) {
-                        if (parseUser != null){
-                            Intent intent = new Intent(LogonActivity.this, MainViewActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Sorry, your username or password is incorrect.", Toast.LENGTH_LONG).show();
-                            login.setEnabled(true);
+                ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                if (networkInfo != null) {
+                    login.setEnabled(false);
+                    usernametxt = username.getText().toString();
+                    passwordtxt = password.getText().toString();
+                    ParseUser.logInInBackground(usernametxt, passwordtxt, new LogInCallback() {
+                        @Override
+                        public void done(ParseUser parseUser, ParseException e) {
+                            if (parseUser != null) {
+                                Intent intent = new Intent(LogonActivity.this, MainViewActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Sorry, your username or password is incorrect.", Toast.LENGTH_LONG).show();
+                                login.setEnabled(true);
+                            }
                         }
-                    }
-                });
+                    });
+                } else {
+                    Toast.makeText(getApplicationContext(), "No network connection", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
