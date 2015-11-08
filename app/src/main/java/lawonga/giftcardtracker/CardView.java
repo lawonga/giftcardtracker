@@ -194,7 +194,6 @@ public class CardView extends AppCompatActivity {
         CardListCreator.cardData.set(cardposition, cardListAdapter);
         CardListCreator.adapter.notifyDataSetChanged();
         point.saveEventually();
-        finish();
     }
 
     @Override

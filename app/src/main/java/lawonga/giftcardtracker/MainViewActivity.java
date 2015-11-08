@@ -207,7 +207,6 @@ public class MainViewActivity extends AppCompatActivity {
     // What happens when back button is pressed: open a new exit dialog fragment
     @Override
     public void onBackPressed() {
-        CardListCreator.cardData.clear();
         DialogFragment exitDialog = new ExitDialogFragment();
         exitDialog.show(getFragmentManager(), "Exit_Dialog");
     }
