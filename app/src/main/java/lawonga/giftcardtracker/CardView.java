@@ -187,17 +187,14 @@ public class CardView extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        // Back press = execute savedata
-        savedata();
-    }
-
-    // Saves data to cloud (forcefully, without getting object first, using pointers)
-    public void savedata(){
+        // Saves data to cloud (forcefully, without getting object first, using pointers)
         ParseObject point = ParseObject.createWithoutData("DataBase", cardId);
         point.put("cardnotes", cardnotesview.getText().toString());
+        CardListAdapter cardListAdapter = new CardListAdapter(cardname, Double.valueOf(cardbalanceview.getText().toString()), cardnotesview.getText().toString(), cardId);
+        CardListCreator.cardData.set(cardposition, cardListAdapter);
+        CardListCreator.adapter.notifyDataSetChanged();
         point.saveEventually();
-        CardListCreator.cardData.set(cardposition, new CardListAdapter(cardname, Double.valueOf(cardbalanceview.getText().toString()), cardnotesview.getText().toString(), cardId));
-        CardListCreator.notifychangeddata();
+        finish();
     }
 
     @Override

@@ -8,25 +8,22 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ScrollView;
 
 import com.parse.ParseUser;
 
@@ -66,6 +63,7 @@ public class MainViewActivity extends AppCompatActivity {
         }
         getSupportFragmentManager().findFragmentById(R.id.container);
 
+        // Code for swipe to top to refresh
         centerLayout.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
@@ -84,8 +82,6 @@ public class MainViewActivity extends AppCompatActivity {
                 }
             }
         });
-
-
 
         // Nav drawer code
         mDrawerToggle = new ActionBarDrawerToggle(this,
