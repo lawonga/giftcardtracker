@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -22,7 +23,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.parse.ParseUser;
@@ -33,7 +34,7 @@ public class MainViewActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
-    private LinearLayout centerLayout;
+    private FrameLayout centerLayout;
     public static SwipeRefreshLayout swipeRefreshLayout;
     // Register global network connectivity
     public static boolean networkStatus;
@@ -47,7 +48,7 @@ public class MainViewActivity extends AppCompatActivity {
         // Initialization
         setContentView(R.layout.activity_main);
         mTitle = getResources().getStringArray(R.array.titles);
-        centerLayout = (LinearLayout)findViewById(R.id.container);
+        centerLayout = (FrameLayout)findViewById(R.id.container);
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mDrawerList = (ListView)findViewById(R.id.left_drawer);
         swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.main_swipeContainer);
@@ -61,27 +62,8 @@ public class MainViewActivity extends AppCompatActivity {
         if (CardListCreator.cardData.isEmpty()) {
             getSupportFragmentManager().beginTransaction().add(R.id.container, cardListCreatorFragment).commit();
         }
-        getSupportFragmentManager().findFragmentById(R.id.container);
-
-        // Code for swipe to top to refresh
-        centerLayout.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-            @Override
-            public void onScrollChanged() {
-                swipeRefreshLayout.setEnabled(false);
-                if (cardListCreatorFragment.getListView().getFirstVisiblePosition() == 0){
-                    swipeRefreshLayout.setEnabled(true);
-                    // Swipe to refresh code
-                    swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                        @Override
-                        public void onRefresh() {
-                            CardListCreator.clearadapter();
-                            CardListAdapter.queryList();
-                            swipeRefreshLayout.setRefreshing(false);
-                        }
-                    });
-                }
-            }
-        });
+        // Implement swipe to refresh
+        swipeToRefresh(cardListCreatorFragment);
 
         // Nav drawer code
         mDrawerToggle = new ActionBarDrawerToggle(this,
@@ -91,22 +73,29 @@ public class MainViewActivity extends AppCompatActivity {
                 R.string.navigation_drawer_close){
             public void onDrawerClosed(View view){
                 super.onDrawerClosed(view);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                getSupportActionBar().setHomeButtonEnabled(false);
             }
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                getSupportActionBar().setHomeButtonEnabled(true);
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.global, menu);
         return true;
+    }
+
+    @Override
+    public void onPostCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
+        super.onPostCreate(savedInstanceState, persistentState);
+        // Hamburger menu on the drawer
+        mDrawerToggle.syncState();
     }
 
     // action_add = create the add card fragment view
@@ -117,7 +106,7 @@ public class MainViewActivity extends AppCompatActivity {
             showEditDialog();
             CardListCreator.notifychangeddata();
         }
-        if(id == R.id.logout){
+        else if(id == R.id.logout){
             CardListCreator.clearadapter();
             ParseUser.logOut();
             if (ParseUser.getCurrentUser() == null) {
@@ -127,6 +116,16 @@ public class MainViewActivity extends AppCompatActivity {
             } else {
                 Log.e("Logout" , "Failed");
             }
+        }
+        else if (id == R.id.action_settings){
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+        }
+        // Pass the event to ActionBarDrawerToggle
+        // If it returns true, then it has handled
+        // the nav drawer indicator touch event
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
         }
         return true;
     }
@@ -192,14 +191,11 @@ public class MainViewActivity extends AppCompatActivity {
                 LogonActivity.currentcard = 0;
             } else if (i==1){
                 LogonActivity.currentcard = 1;
-            } else {
-                LogonActivity.currentcard = 2;
-                centerLayout.removeAllViews();
-                return rootView;
             }
             CardListCreator.clearadapter();
-            centerLayout.removeAllViews();
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, new CardListCreator()).commit();
+            final CardListCreator cardListCreatorFragment = new CardListCreator();
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, cardListCreatorFragment).commit();
+            swipeToRefresh(cardListCreatorFragment);
             return rootView;
         }
     }
@@ -216,5 +212,33 @@ public class MainViewActivity extends AppCompatActivity {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         return networkInfo != null;
+    }
+
+    // Swipe to refresh
+    public void swipeToRefresh(final CardListCreator cardListCreatorFragment){
+        // Code for swipe to top to refresh
+        centerLayout.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                swipeRefreshLayout.setEnabled(false);
+                try {
+                    if (cardListCreatorFragment.getListView().getFirstVisiblePosition() == 0) {
+                        swipeRefreshLayout.setEnabled(true);
+                        // Swipe to refresh code
+                        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                            @Override
+                            public void onRefresh() {
+                                CardListCreator.clearadapter();
+                                CardListAdapter.queryList();
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    Log.e("SwipeRefresh ", e.toString());
+                }
+
+            }
+        });
     }
 }

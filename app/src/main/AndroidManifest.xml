@@ -28,6 +28,9 @@
             android:name=".CardView"
             android:label="@string/card_name" />
         <activity
+            android:name=".SettingsActivity"
+            android:label="@string/settings_name" />
+        <activity
             android:name=".NewUser"
             android:label="@string/register_screen" />
     </application>

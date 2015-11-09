@@ -10,9 +10,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,11 +72,10 @@ public class CardListAdapter {
                             currentCardNotes = object.getString("cardnotes");
                             objectID = object.getObjectId();
                             CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID));
-                            CardListCreator.notifychangeddata();
                         }
+                        CardListCreator.notifychangeddata();
                         // Repins the updated data
                         ParseObject.pinAllInBackground(PINNED_CARD, parseObjects);
-                        CardListCreator.notifychangeddata();
                     } else {
                         Log.e("Download Error ", e.toString());
                     }

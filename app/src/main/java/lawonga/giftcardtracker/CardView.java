@@ -93,6 +93,9 @@ public class CardView extends AppCompatActivity {
 
         // Enables action bar & home button
         setTitle(cardname);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
 
         // Set the bundles so we dont duplicate code
         final Bundle bundle = new Bundle();
@@ -145,6 +148,9 @@ public class CardView extends AppCompatActivity {
             NewCardFragment.createCard(nametxt, initialbalancetxt, "DataBase", cardNotes);
             deleteCurrentCard();
             Toast.makeText(getApplication(), "Card Unarchived", Toast.LENGTH_LONG).show();
+        } else if (id == android.R.id.home){
+            this.finish();
+            return true;
         }
 
         return false;

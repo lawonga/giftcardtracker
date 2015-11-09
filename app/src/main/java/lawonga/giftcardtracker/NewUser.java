@@ -8,7 +8,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
@@ -24,7 +23,7 @@ public class NewUser extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         // Initialization
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.register_screen);
+        setContentView(R.layout.register_layout);
         name = (EditText)findViewById(R.id.name_register);
         username = (EditText)findViewById(R.id.username_register);
         email = (EditText)findViewById(R.id.email_register);
@@ -32,7 +31,7 @@ public class NewUser extends Activity {
         passwordagain = (EditText)findViewById(R.id.password_register_again);
         registerbutton = (Button)findViewById(R.id.register_button);
 
-        // Onclicklistener
+        // User clicks register button
         registerbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,6 +58,7 @@ public class NewUser extends Activity {
                         public void done(ParseException e) {
                             if(e == null){
                                 Toast.makeText(getApplicationContext(),"Account Created!", Toast.LENGTH_LONG).show();
+                                finish();
                             }else {
                                 Toast.makeText(getApplicationContext(),"Account Creation Failed: Unknown Error", Toast.LENGTH_LONG).show();
                             }
