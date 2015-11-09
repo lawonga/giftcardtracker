@@ -106,17 +106,6 @@ public class MainViewActivity extends AppCompatActivity {
             showEditDialog();
             CardListCreator.notifychangeddata();
         }
-        else if(id == R.id.logout){
-            CardListCreator.clearadapter();
-            ParseUser.logOut();
-            if (ParseUser.getCurrentUser() == null) {
-                Intent intent = new Intent(this, LogonActivity.class);
-                startActivity(intent);
-                finish();
-            } else {
-                Log.e("Logout" , "Failed");
-            }
-        }
         else if (id == R.id.action_settings){
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);

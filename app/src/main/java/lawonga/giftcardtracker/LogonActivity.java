@@ -124,11 +124,11 @@ public class LogonActivity extends AppCompatActivity {
             LinearLayout container = new LinearLayout(getActivity());
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-            // Get 10 dp to pixels
+            // Get 10 dp to pixels to set the margins
             final float scale = getActivity().getResources().getDisplayMetrics().density;
-            int pixels = (int) (20 * scale + 0.5f);
+            int pixelMargin = (int) (20 * scale + 0.5f);
 
-            layoutParams.setMargins(pixels, 0, pixels, 0);
+            layoutParams.setMargins(pixelMargin, 0, pixelMargin, 0);
             emailEditText.setLayoutParams(layoutParams);
             container.addView(emailEditText);
             builder.setView(container);
