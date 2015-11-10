@@ -43,6 +43,8 @@ public class CardView extends AppCompatActivity {
     public static TextView cardbalanceview;
     private EditText cardnotesview;
     private Button cardadd, cardsubtract;
+    boolean networkstatus;
+    public static boolean isNetworkConnected;
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -85,6 +87,7 @@ public class CardView extends AppCompatActivity {
         cardname = intent.getStringExtra("cardname");
         cardNotes = intent.getStringExtra("cardnotes");
         cardbalance = intent.getDoubleExtra("cardbalance", cardbalance);
+        networkstatus = intent.getBooleanExtra("networkstatus", true);
 
         // Sets the texts from data we just got
         cardnameview.setText(cardname);
@@ -141,11 +144,11 @@ public class CardView extends AppCompatActivity {
             Toast.makeText(getApplication(), "Card Deleted", Toast.LENGTH_LONG).show();
         } else if (id == R.id.archive){
             // Create card in archive + delete card in cloud
-            NewCardFragment.createCard(nametxt, initialbalancetxt, "Archive", cardNotes);
+            NewCardFragment.createCard(nametxt, initialbalancetxt, "Archive", cardNotes, "Archive");
             deleteCurrentCard();
             Toast.makeText(getApplication(), "Card Archived", Toast.LENGTH_LONG).show();
         } else if (id == R.id.unarchive){
-            NewCardFragment.createCard(nametxt, initialbalancetxt, "DataBase", cardNotes);
+            NewCardFragment.createCard(nametxt, initialbalancetxt, "DataBase", cardNotes, "DataBase");
             deleteCurrentCard();
             Toast.makeText(getApplication(), "Card Unarchived", Toast.LENGTH_LONG).show();
         } else if (id == android.R.id.home){
@@ -161,17 +164,17 @@ public class CardView extends AppCompatActivity {
         Map<String, Object> map = new HashMap<>();
         map.put("currentCard", LogonActivity.currentcard);
         map.put("cardId", cardId);
-
+        // Check if network connected before deleting
         if (isNetworkConnected()) {
             ParseCloud.callFunctionInBackground("deletecard", map, new FunctionCallback<String>() {
                 @Override
                 public void done(String s, ParseException e) {
                     if (e != null) Log.e("Error ", e.toString());
                     else Log.e("Success", "aw ye");
+                    CardListCreator.clearadapter();
+                    CardListAdapter.queryList();
                 }
             });
-            CardListCreator.cardData.remove(cardposition);
-            CardListCreator.adapter.notifyDataSetChanged();
             finish();
         } else {
             ParseObject object = ParseObject.createWithoutData("DataBase", cardId);
@@ -180,9 +183,10 @@ public class CardView extends AppCompatActivity {
                 public void done(ParseObject parseObject, ParseException e) {
                     if (e==null){
                         parseObject.deleteEventually();
-                        Log.e("Offline", "Save Successful");
+                        Log.e("Offline", "Delete Successful");
+                        finish();
                     } else {
-                        Log.e("Offline", "Save failed");
+                        Log.e("Offline", "Delete failed");
                     }
                 }
             });
@@ -196,10 +200,14 @@ public class CardView extends AppCompatActivity {
         // Saves data to cloud (forcefully, without getting object first, using pointers)
         ParseObject point = ParseObject.createWithoutData("DataBase", cardId);
         point.put("cardnotes", cardnotesview.getText().toString());
-        CardListAdapter cardListAdapter = new CardListAdapter(cardname, Double.valueOf(cardbalanceview.getText().toString()), cardnotesview.getText().toString(), cardId);
-        CardListCreator.cardData.set(cardposition, cardListAdapter);
-        CardListCreator.adapter.notifyDataSetChanged();
         point.saveEventually();
+        Log.e ("Isnetworkconnected", String.valueOf(isNetworkConnected()));
+        Log.e ("networkstatus", String.valueOf(networkstatus));
+        isNetworkConnected = isNetworkConnected();
+        if (networkstatus && !isNetworkConnected){
+            CardListAdapter.queryList();
+            Log.e("networkstatus", "!isnetworkconnected");
+        }
     }
 
     @Override

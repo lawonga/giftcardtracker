@@ -39,6 +39,7 @@ public class CardListCreator extends ListFragment {
         String cardnotes = cardData.get(position).getCardNotes();
         String cardId = cardData.get(position).getObjectId();
         Intent intent = new Intent(v.getContext(), CardView.class);
+        intent.putExtra("networkstatus", MainViewActivity.networkStatus);
         intent.putExtra("cardposition", position);
         intent.putExtra("cardbalance", cardbalance);
         intent.putExtra("cardname", cardname);

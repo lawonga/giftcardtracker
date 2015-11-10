@@ -40,6 +40,11 @@ public class LogonActivity extends AppCompatActivity {
     public static int currentcard;
 
     @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new ParseInitialization();

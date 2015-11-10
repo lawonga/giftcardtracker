@@ -1,6 +1,9 @@
 package lawonga.giftcardtracker;
 
 import android.app.DialogFragment;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -15,6 +18,7 @@ import android.widget.Toast;
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +32,6 @@ public class ModifyCardFragment extends DialogFragment {
     Double cardvalue;
     Double finalcardmodifier;
     Double finalcardvalue;
-    Double roundedfinalcardvalue;
     int cardposition;
     TextView addorsubtract_textview;
     EditText addorsubtract_edittextview;
@@ -55,6 +58,7 @@ public class ModifyCardFragment extends DialogFragment {
         addorsubctract_add.setOnClickListener(new View.OnClickListener() {
               @Override
               public void onClick(View v) {
+                  boolean isNetworkConnected = isNetworkConnected();
                   if (addorsubtract_edittextview.getText().toString().equals("")){
                       addorsubtract_edittextview.setText("0");
                   }
@@ -65,23 +69,29 @@ public class ModifyCardFragment extends DialogFragment {
                       finalcardmodifier = Double.valueOf(Math.round(Double.valueOf(addorsubtract_edittextview.getText().toString())*-100)/100);
                   }
                   addorsubctract_add.setEnabled(false);
-                  Map<String, Object> map = new HashMap<>(2);
-                  map.put("cardmodifier", finalcardmodifier);
-                  map.put("cardId", cardId);
-                  ParseCloud.callFunctionInBackground("modifycard", map, new FunctionCallback<String>() {
-                      @Override
-                      public void done(String s, ParseException e) {
-                          if (e == null) {
-                              cardvalue = Double.valueOf(CardView.cardbalanceview.getText().toString());
-                              finalcardvalue = cardvalue + finalcardmodifier;
-                              CardView.cardbalanceview.setText(String.valueOf(finalcardvalue));
-                          } else {
-                              Log.e("Error: ", e.toString());
-                              Toast.makeText(getActivity(), "Unknown Error", Toast.LENGTH_LONG).show();
+                  cardvalue = Double.valueOf(CardView.cardbalanceview.getText().toString());
+                  finalcardvalue = cardvalue + finalcardmodifier;
+                  CardView.cardbalanceview.setText(String.valueOf(finalcardvalue));
+                  if (isNetworkConnected) {
+                      Map<String, Object> map = new HashMap<>(2);
+                      map.put("cardmodifier", finalcardmodifier);
+                      map.put("cardId", cardId);
+                      ParseCloud.callFunctionInBackground("modifycard", map, new FunctionCallback<String>() {
+                          @Override
+                          public void done(String s, ParseException e) {
+                              if (e!=null){
+                                  Log.e("Error: ", e.toString());
+                                  Toast.makeText(getActivity(), "Unknown Error", Toast.LENGTH_LONG).show();
+                              }
+                              dismiss();
                           }
-                          dismiss();
-                      }
-                  });
+                      });
+                  } else {
+                      ParseObject point = ParseObject.createWithoutData("DataBase", cardId);
+                      point.put("balance", finalcardvalue);
+                      point.saveEventually();
+                      dismiss();
+                  }
               }
           }
         );
@@ -92,5 +102,11 @@ public class ModifyCardFragment extends DialogFragment {
             }
         });
         return view;
+    }
+    // Network state check
+    public boolean isNetworkConnected(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null;
     }
 }

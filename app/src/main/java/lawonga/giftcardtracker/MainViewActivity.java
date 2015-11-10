@@ -37,12 +37,14 @@ public class MainViewActivity extends AppCompatActivity {
     private FrameLayout centerLayout;
     public static SwipeRefreshLayout swipeRefreshLayout;
     // Register global network connectivity
-    public static boolean networkStatus;
+    public static boolean networkStatus, initialized = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Log.e("Class", "Create");
+        // Check network status
         networkStatus = isNetworkConnected();
 
         // Initialization
@@ -57,13 +59,7 @@ public class MainViewActivity extends AppCompatActivity {
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         mDrawerList.setItemChecked(0, true);
 
-        // This code CREATES the entire list with CHECKS on network state
-        final CardListCreator cardListCreatorFragment = new CardListCreator();
-        if (CardListCreator.cardData.isEmpty()) {
-            getSupportFragmentManager().beginTransaction().add(R.id.container, cardListCreatorFragment).commit();
-        }
-        // Implement swipe to refresh
-        swipeToRefresh(cardListCreatorFragment);
+
 
         // Nav drawer code
         mDrawerToggle = new ActionBarDrawerToggle(this,
@@ -86,6 +82,26 @@ public class MainViewActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        Log.e("Class", "Start");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.e("Class", "Resume");
+        Log.e("Boolean", String.valueOf(initialized));
+        // This code CREATES the entire list with CHECKS on network state
+        final CardListCreator cardListCreatorFragment = new CardListCreator();
+        if (getSupportFragmentManager().findFragmentById(R.id.container) == null) {
+            getSupportFragmentManager().beginTransaction().add(R.id.container, cardListCreatorFragment).commit();
+        }
+        // Implement swipe to refresh
+        swipeToRefresh(cardListCreatorFragment);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.global, menu);
         return true;
@@ -98,6 +114,16 @@ public class MainViewActivity extends AppCompatActivity {
         mDrawerToggle.syncState();
     }
 
+    // After if settings menu came back after logging out
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1){
+            if (resultCode == RESULT_OK){
+                finish();
+            }
+        }
+    }
+
     // action_add = create the add card fragment view
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -108,7 +134,8 @@ public class MainViewActivity extends AppCompatActivity {
         }
         else if (id == R.id.action_settings){
             Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, 1);
+            finish();
         }
         // Pass the event to ActionBarDrawerToggle
         // If it returns true, then it has handled
@@ -196,6 +223,32 @@ public class MainViewActivity extends AppCompatActivity {
         exitDialog.show(getFragmentManager(), "Exit_Dialog");
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.e("Class", "Restart");
+    }
+
+    // On pause
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.e("Class", "Stop");
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        CardListCreator.clearadapter();
+        getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(R.id.container)).commit();
+        Log.e("Class", "Pause");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e("Class", "Destroy");
+    }
+
     // Network state check
     public boolean isNetworkConnected(){
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -217,14 +270,14 @@ public class MainViewActivity extends AppCompatActivity {
                         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                             @Override
                             public void onRefresh() {
+                                networkStatus = isNetworkConnected();
                                 CardListCreator.clearadapter();
                                 CardListAdapter.queryList();
                                 swipeRefreshLayout.setRefreshing(false);
                             }
                         });
                     }
-                } catch (Exception e) {
-                    Log.e("SwipeRefresh ", e.toString());
+                } catch (Exception ignored) {
                 }
 
             }

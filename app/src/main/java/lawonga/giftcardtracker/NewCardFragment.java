@@ -16,6 +16,7 @@ import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,10 +46,8 @@ public class NewCardFragment extends DialogFragment {
                 if(nametxt.equals("") || initialbalancetxt.equals("")){
                     Toast.makeText(v.getContext(),"Please fill in all fields", Toast.LENGTH_LONG).show();
                 } else {
-                    createCard(nametxt, initialbalancetxt, "DataBase", "");
+                    createCard(nametxt, initialbalancetxt, "DataBase", "", "DataBase");
                     dismiss();
-                    CardListCreator.clearadapter();
-                    CardListAdapter.queryList();
                 }
             }
         });
@@ -61,17 +60,36 @@ public class NewCardFragment extends DialogFragment {
         return view;
     }
 
-    public static void createCard(String nametext, String initialbalancetext,  String databaseclass, String cardnotes){
+    public static void createCard(final String nametext, final String initialbalancetext,  String databaseclass, String cardnotes, String cardtype){
         Map<String, Object> map = new HashMap<>();
         map.put("cardname", nametext);
         map.put("balance", Double.valueOf(initialbalancetext));
         map.put("database", databaseclass);
         map.put("cardnotes", cardnotes);
-        ParseCloud.callFunctionInBackground("createcard", map, new FunctionCallback<String>() {
-            @Override
-            public void done(String s, ParseException e) {
-                // COMPLETE
-            }
-        });
+        // Check if network is connected before creating the card
+        if (CardView.isNetworkConnected) {
+            ParseCloud.callFunctionInBackground("createcard", map, new FunctionCallback<String>() {
+                @Override
+                public void done(String s, ParseException e) {
+                    // COMPLETE
+                    CardListCreator.clearadapter();
+                    CardListAdapter.queryList();
+                }
+            });
+        } else {
+            final ParseObject parseObject = new ParseObject(cardtype);
+            parseObject.put("cardname", nametext);
+            parseObject.put("balance", Double.valueOf(initialbalancetext));
+            parseObject.put("cardnotes", cardnotes);
+            parseObject.put("user", ParseUser.getCurrentUser());
+            parseObject.pinInBackground(String.valueOf(LogonActivity.currentcard), new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    CardListCreator.cardData.add(new CardListAdapter(nametext, Double.valueOf(initialbalancetext), "", parseObject.getObjectId()));
+                    CardListCreator.notifychangeddata();
+                    parseObject.saveEventually();
+                }
+            });
+        }
     }
 }

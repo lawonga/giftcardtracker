@@ -22,6 +22,7 @@ import java.util.Map;
 public class CardListAdapter {
     public String cardname, cardnotes, objectId;
     public double cardbalance;
+    static String accesslocation;
     public CardListAdapter(String cardname, double cardbalance, String cardnotes, String objectId){
         this.cardname = cardname;
         this.cardbalance = cardbalance;
@@ -41,51 +42,25 @@ public class CardListAdapter {
     public String getCardNotes() {
         return cardnotes;
     }
-    final static String PINNED_CARD = "pinCard";
 
     public static void queryList(){
+        if (LogonActivity.currentcard == 0){
+            accesslocation = "DataBase";
+        } else if (LogonActivity.currentcard == 1){
+            accesslocation = "Archive";
+        }
         if (MainViewActivity.networkStatus) {
-            // Querys list from the cloudcode via retrievecard.js; retrieves all card
-            Map<String, Object> map = new HashMap<>(2);
-            map.put("userId", ParseUser.getCurrentUser().getObjectId());
-            map.put("currentCard", LogonActivity.currentcard);
-            ParseCloud.callFunctionInBackground("retrievecard", map, new FunctionCallback<ArrayList<ParseObject>>() {
-                @Override
-                public void done(ArrayList<ParseObject> parseObjects, ParseException e) {
-                    if (e == null) {
-                        Log.e("ParseObject", parseObjects.toString());
-                        // Unpins all as to avoid duplicates
-                        try {
-                            ParseObject.unpinAll();
-                            Log.e("Unpin Objects", "success");
-                        } catch (ParseException e1) {
-                            e1.printStackTrace();
-                            Log.e("Unpin Objects", e1.toString());
-                        }
-                        // Grabs data from parsecloud
-                        for (final ParseObject object : parseObjects) {
-                            // PER card has different data, hence why these are placed in here
-                            String cardnameobject, objectID, currentCardNotes;
-                            Double cardnamebalance;
-                            cardnameobject = object.getString("cardname");
-                            cardnamebalance = object.getDouble("balance");
-                            currentCardNotes = object.getString("cardnotes");
-                            objectID = object.getObjectId();
-                            CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID));
-                        }
-                        CardListCreator.notifychangeddata();
-                        // Repins the updated data
-                        ParseObject.pinAllInBackground(PINNED_CARD, parseObjects);
-                    } else {
-                        Log.e("Download Error ", e.toString());
-                    }
-                }
-
-            });
-        }  else if (!MainViewActivity.networkStatus) {
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("DataBase");
+            // Unpins all as to avoid duplicates
+            try {
+                ParseObject.unpinAll();
+                Log.e("Unpin Objects", "success");
+            } catch (ParseException ignored){}
+            cloudQuery(0);
+            cloudQuery(1);
+        } else if (!MainViewActivity.networkStatus || !CardView.isNetworkConnected) {
+            ParseQuery<ParseObject> query = ParseQuery.getQuery(accesslocation);
             query.orderByAscending("cardname");
-            query.fromLocalDatastore();
+            query.fromPin(String.valueOf(LogonActivity.currentcard));
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> list, ParseException e) {
@@ -99,8 +74,8 @@ public class CardListAdapter {
                             objectID = object.getObjectId();
                             CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID));
                             CardListCreator.notifychangeddata();
-                            Log.e("Local Datastore", objectID);
                         }
+                        Log.e("Current request", String.valueOf(LogonActivity.currentcard));
                     } else {
                         Log.e("Local Datastore", e.toString());
                     }
@@ -108,5 +83,39 @@ public class CardListAdapter {
             });
             Log.e("Network State", "OFF");
         }
+    }
+
+    public static void cloudQuery(final int cardTarget){
+        // Querys list from the cloudcode via retrievecard.js; retrieves all card
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("userId", ParseUser.getCurrentUser().getObjectId());
+        map.put("currentCard", cardTarget);
+        ParseCloud.callFunctionInBackground("retrievecard", map, new FunctionCallback<ArrayList<ParseObject>>() {
+            @Override
+            public void done(ArrayList<ParseObject> parseObjects, ParseException e) {
+                if (e == null) {
+                    Log.e("ParseObject", parseObjects.toString());
+                    if (cardTarget == LogonActivity.currentcard) {
+                        // Grabs data from the downloaded object
+                        for (final ParseObject object : parseObjects) {
+                            // PER card has different data, hence why these are placed in here
+                            String cardnameobject, objectID, currentCardNotes;
+                            Double cardnamebalance;
+                            cardnameobject = object.getString("cardname");
+                            cardnamebalance = object.getDouble("balance");
+                            currentCardNotes = object.getString("cardnotes");
+                            objectID = object.getObjectId();
+                            CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID));
+                        }
+                    }
+                    CardListCreator.notifychangeddata();
+                    // Repins the updated data
+                    ParseObject.pinAllInBackground(String.valueOf(cardTarget), parseObjects);
+                } else {
+                    Log.e("Download Error ", e.toString());
+                }
+            }
+
+        });
     }
 }

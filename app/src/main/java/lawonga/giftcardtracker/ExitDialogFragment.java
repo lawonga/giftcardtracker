@@ -16,7 +16,8 @@ public class ExitDialogFragment extends DialogFragment {
         builder.setMessage("Are you sure you want to exit?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                CardListCreator.cardData.clear();
+                CardListCreator.clearadapter();
+                MainViewActivity.initialized = false;
                 getActivity().finish();
             }
         }).setNegativeButton("No", new DialogInterface.OnClickListener() {

@@ -1,6 +1,9 @@
 package lawonga.giftcardtracker;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,7 +23,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,59 +69,29 @@ public class SettingsActivity extends AppCompatActivity{
         settingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-                switch (position){
-                    // Change password code
-                    case 0:
-                        // Builder builds the dialog
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getApplication());
-                        final EditText newpasswordEditText = new EditText(getApplication());
-                        final TextView newPasswordTextView = new TextView(getApplication());
-                        newPasswordTextView.setText("Enter your new password");
-                        newpasswordEditText.setSingleLine();
-                        newpasswordEditText.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                        LinearLayout container = new LinearLayout(getApplication());
-                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                        container.setOrientation(LinearLayout.VERTICAL);
-                        // Get 10 dp to pixels to set the margins
-                        final float scale = getApplication().getResources().getDisplayMetrics().density;
-                        int pixelMargin = (int) (20 * scale + 0.5f);
-                        layoutParams.setMargins(pixelMargin, 0, pixelMargin, 0);
-                        container.setLayoutParams(layoutParams);
-                        container.addView(newpasswordEditText);
-                        container.addView(newPasswordTextView);
-                        builder.setView(container);
-                        builder.setMessage("Password Reset");
-                        // Set the buttons to do whatever
-                        builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (newpasswordEditText.getText().toString() != ""){
-                                    ParseUser parseUser = ParseUser.getCurrentUser();
-                                    parseUser.setPassword(newpasswordEditText.getText().toString());
-                                    Toast.makeText(getApplication(), "Password reset!", Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
+                if(position == 0) {
+                    FragmentManager fragmentManager = getFragmentManager();
+                    ChangePasswordDialog changePasswordDialog = new ChangePasswordDialog();
+                    changePasswordDialog.show(fragmentManager, "reset_password");
+                }
+                if(position == 1){
+                    FragmentManager fragmentManager = getFragmentManager();
+                    ChangeEmailDialog changeEmailDialog= new ChangeEmailDialog();
+                    changeEmailDialog.show(fragmentManager, "reset_email");
+                }
 
-                    case 1:
-
-                    case 2:
 
                     // Logout code
-                    case 3:
-                        CardListCreator.clearadapter();
-                        ParseUser.logOut();
-                        if (ParseUser.getCurrentUser() == null) {
-                            startActivity(logoutIntent);
-                            finish();
-                        } else {
-                            Log.e("Logout", "Failed");
-                        }
+                if (position == 3) {
+                    CardListCreator.clearadapter();
+                    ParseUser.logOut();
+                    if (ParseUser.getCurrentUser() == null) {
+                        setResult(RESULT_OK, null);
+                        startActivity(logoutIntent);
+                        finish();
+                    } else {
+                        Log.e("Logout", "Failed");
+                    }
                 }
             }
         });
@@ -140,6 +115,114 @@ public class SettingsActivity extends AppCompatActivity{
         @Override
         public boolean hasStableIds() {
             return true;
+        }
+    }
+
+    public class ChangePasswordDialog extends DialogFragment{
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Change password code
+            // Builder builds the dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            final TextView newPasswordTextView = new TextView(getActivity());
+            final EditText newPasswordEditText = new EditText(getActivity());
+            newPasswordTextView.setText("Enter your new password");
+            newPasswordEditText.setSingleLine();
+            newPasswordEditText.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            LinearLayout container = new LinearLayout(getActivity());
+            container.setOrientation(LinearLayout.VERTICAL);
+            // Get 10 dp to pixels to set the margins
+            final float scale = getActivity().getResources().getDisplayMetrics().density;
+            int pixelMargin = (int) (20 * scale + 0.5f);
+            layoutParams.setMargins(pixelMargin, 0, pixelMargin, 0);
+            newPasswordTextView.setLayoutParams(layoutParams);
+            newPasswordEditText.setLayoutParams(layoutParams);
+            container.setLayoutParams(layoutParams);
+            container.addView(newPasswordEditText);
+            container.addView(newPasswordTextView);
+            builder.setView(container);
+            builder.setMessage("Password Change");
+            // Set the buttons to do whatever
+            builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (newPasswordEditText.getText().toString() != "") {
+                        ParseUser parseUser = ParseUser.getCurrentUser();
+                        parseUser.setPassword(newPasswordEditText.getText().toString());
+                        parseUser.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e != null) {
+                                    FragmentManager fragmentManager = getFragmentManager();
+                                    ChangePasswordDialog changePasswordDialog = new ChangePasswordDialog();
+                                    changePasswordDialog.show(fragmentManager, "reset_password");
+                                } else Toast.makeText(getBaseContext(), "Password change successful", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                }
+            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            return builder.create();
+        }
+    }
+
+    public class ChangeEmailDialog extends DialogFragment{
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Change password code
+            // Builder builds the dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            final TextView newPasswordTextView = new TextView(getActivity());
+            final EditText newEmailEditText = new EditText(getActivity());
+            newPasswordTextView.setText("Enter your new email");
+            newEmailEditText.setSingleLine();
+            LinearLayout container = new LinearLayout(getActivity());
+            container.setOrientation(LinearLayout.VERTICAL);
+            // Get 10 dp to pixels to set the margins
+            final float scale = getActivity().getResources().getDisplayMetrics().density;
+            int pixelMargin = (int) (20 * scale + 0.5f);
+            layoutParams.setMargins(pixelMargin, 0, pixelMargin, 0);
+            newPasswordTextView.setLayoutParams(layoutParams);
+            newEmailEditText.setLayoutParams(layoutParams);
+            container.setLayoutParams(layoutParams);
+            container.addView(newEmailEditText);
+            container.addView(newPasswordTextView);
+            builder.setView(container);
+            builder.setMessage("Email Change");
+            // Set the buttons to do whatever
+            builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (newEmailEditText.getText().toString() != "") {
+                        ParseUser parseUser = ParseUser.getCurrentUser();
+                        parseUser.setEmail(newEmailEditText.getText().toString());
+                        parseUser.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e!=null){
+                                    FragmentManager fragmentManager = getFragmentManager();
+                                    ChangeEmailDialog changeEmailDialog= new ChangeEmailDialog();
+                                    changeEmailDialog.show(fragmentManager, "reset_email");
+                                } else Toast.makeText(getBaseContext(), "Email change successful", Toast.LENGTH_LONG).show();
+
+                            }
+                        });
+                    }
+                }
+            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            return builder.create();
         }
     }
 }
