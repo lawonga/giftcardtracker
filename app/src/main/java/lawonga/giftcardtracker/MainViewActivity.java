@@ -8,8 +8,10 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -25,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.Toolbar;
 
 import com.parse.ParseUser;
 
@@ -35,6 +38,7 @@ public class MainViewActivity extends AppCompatActivity {
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private FrameLayout centerLayout;
+    private FloatingActionButton fab;
     public static SwipeRefreshLayout swipeRefreshLayout;
     // Register global network connectivity
     public static boolean networkStatus, initialized = false;
@@ -54,12 +58,12 @@ public class MainViewActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mDrawerList = (ListView)findViewById(R.id.left_drawer);
         swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.main_swipeContainer);
+        fab = (FloatingActionButton)findViewById(R.id.fab);
+
         // Set the Adapter for list View
         mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, mTitle));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         mDrawerList.setItemChecked(0, true);
-
-
 
         // Nav drawer code
         mDrawerToggle = new ActionBarDrawerToggle(this,
@@ -75,10 +79,19 @@ public class MainViewActivity extends AppCompatActivity {
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.ic_drawer);
+        mDrawerToggle.syncState();
 
+        // Floating action button, add card action
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showEditDialog();
+                CardListCreator.notifychangeddata();
+            }
+        });
     }
 
     @Override
@@ -96,6 +109,8 @@ public class MainViewActivity extends AppCompatActivity {
         final CardListCreator cardListCreatorFragment = new CardListCreator();
         if (getSupportFragmentManager().findFragmentById(R.id.container) == null) {
             getSupportFragmentManager().beginTransaction().add(R.id.container, cardListCreatorFragment).commit();
+        } else {
+            getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(R.id.container));
         }
         // Implement swipe to refresh
         swipeToRefresh(cardListCreatorFragment);
@@ -132,10 +147,9 @@ public class MainViewActivity extends AppCompatActivity {
             showEditDialog();
             CardListCreator.notifychangeddata();
         }
-        else if (id == R.id.action_settings){
+        if (id == R.id.action_settings){
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivityForResult(intent, 1);
-            finish();
         }
         // Pass the event to ActionBarDrawerToggle
         // If it returns true, then it has handled
@@ -238,8 +252,8 @@ public class MainViewActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        CardListCreator.clearadapter();
-        getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(R.id.container)).commit();
+        // CardListCreator.clearadapter();
+        // getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(R.id.container)).commit();
         Log.e("Class", "Pause");
     }
 
@@ -264,7 +278,7 @@ public class MainViewActivity extends AppCompatActivity {
             public void onScrollChanged() {
                 swipeRefreshLayout.setEnabled(false);
                 try {
-                    if (cardListCreatorFragment.getListView().getFirstVisiblePosition() == 0) {
+                    if (cardListCreatorFragment.getListView().getFirstVisiblePosition() == 0 && cardListCreatorFragment.getListView().getChildAt(0).getTop() == 0) {
                         swipeRefreshLayout.setEnabled(true);
                         // Swipe to refresh code
                         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

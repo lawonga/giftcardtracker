@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
@@ -134,8 +133,7 @@ public class SettingsActivity extends AppCompatActivity{
             container.setOrientation(LinearLayout.VERTICAL);
             // Get 10 dp to pixels to set the margins
             final float scale = getActivity().getResources().getDisplayMetrics().density;
-            int pixelMargin = (int) (20 * scale + 0.5f);
-            layoutParams.setMargins(pixelMargin, 0, pixelMargin, 0);
+            layoutParams.setMargins(ReusableLogic.densityPixel(scale, 10), 0, ReusableLogic.densityPixel(scale, 10), 0);
             newPasswordTextView.setLayoutParams(layoutParams);
             newPasswordEditText.setLayoutParams(layoutParams);
             container.setLayoutParams(layoutParams);
@@ -185,10 +183,8 @@ public class SettingsActivity extends AppCompatActivity{
             newEmailEditText.setSingleLine();
             LinearLayout container = new LinearLayout(getActivity());
             container.setOrientation(LinearLayout.VERTICAL);
-            // Get 10 dp to pixels to set the margins
             final float scale = getActivity().getResources().getDisplayMetrics().density;
-            int pixelMargin = (int) (20 * scale + 0.5f);
-            layoutParams.setMargins(pixelMargin, 0, pixelMargin, 0);
+            layoutParams.setMargins(ReusableLogic.densityPixel(scale, 10), 0, ReusableLogic.densityPixel(scale, 10), 0);
             newPasswordTextView.setLayoutParams(layoutParams);
             newEmailEditText.setLayoutParams(layoutParams);
             container.setLayoutParams(layoutParams);

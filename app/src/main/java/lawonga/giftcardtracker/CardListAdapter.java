@@ -37,7 +37,9 @@ public class CardListAdapter {
         return cardbalance;
     }
     public String getObjectId(){
-        return objectId;
+        if (objectId == null){
+            return "temp_id";
+        } else return objectId;
     }
     public String getCardNotes() {
         return cardnotes;

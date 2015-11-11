@@ -4,16 +4,26 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
 /**
  * Created by lawonga on 9/26/2015.
+ *
+ * This class handles all of the cards being created in each of the listviews within the container.
+ * Instead of going to find the ListView in the XML, set everything programmatically here.
+ * 1 class run = 1 new card
+ * Using CardListAdapter.querylist to run and grab a card (may take some time)
+ * Creates the blank adapter known as CardData first
+ * CardListAdapter places things into the CardData and notifies the list to add the stuff in and update
  */
 public class CardListCreator extends ListFragment {
     public static CustomAdapter adapter;
     public static ArrayList<CardListAdapter> cardData = new ArrayList<>();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,6 +31,15 @@ public class CardListCreator extends ListFragment {
         // Custom View Layout
         adapter = new CustomAdapter(getActivity(), cardData);
         setListAdapter(adapter);
+    }
+
+    // Sets things after view has been created
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ListView listView = getListView();
+        listView.setDivider(null);
+        listView.setDividerHeight(0);
     }
 
     public static void notifychangeddata() {
