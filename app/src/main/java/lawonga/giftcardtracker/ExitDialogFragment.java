@@ -17,7 +17,7 @@ public class ExitDialogFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 CardListCreator.clearadapter();
-                MainViewActivity.initialized = false;
+                CardListCreator.adapter = null;
                 getActivity().finish();
             }
         }).setNegativeButton("No", new DialogInterface.OnClickListener() {

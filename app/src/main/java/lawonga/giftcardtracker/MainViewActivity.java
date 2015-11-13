@@ -29,6 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Toolbar;
 
+import com.github.jlmd.animatedcircleloadingview.AnimatedCircleLoadingView;
 import com.parse.ParseUser;
 
 public class MainViewActivity extends AppCompatActivity {
@@ -40,13 +41,26 @@ public class MainViewActivity extends AppCompatActivity {
     private FrameLayout centerLayout;
     private FloatingActionButton fab;
     public static SwipeRefreshLayout swipeRefreshLayout;
+    public static AnimatedCircleLoadingView animatedCircleLoadingView;
     // Register global network connectivity
-    public static boolean networkStatus, initialized = false;
+    public static boolean networkStatus;
+    private boolean isRunning = false;
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        MainViewActivity.animatedCircleLoadingView.setVisibility(View.INVISIBLE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try{
+            Log.e("cardData", String.valueOf(CardListCreator.cardData));
+            Log.e("adapter", String.valueOf(CardListCreator.adapter));
+            Log.e("listLength", String.valueOf(CardListCreator.cardData.size()));
+        } catch (Exception ignored){}
+
         Log.e("Class", "Create");
         // Check network status
         networkStatus = isNetworkConnected();
@@ -59,6 +73,9 @@ public class MainViewActivity extends AppCompatActivity {
         mDrawerList = (ListView)findViewById(R.id.left_drawer);
         swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.main_swipeContainer);
         fab = (FloatingActionButton)findViewById(R.id.fab);
+        animatedCircleLoadingView = (AnimatedCircleLoadingView)findViewById(R.id.circle_loading_view);
+        LogonActivity.currentcard = 0;
+
 
         // Set the Adapter for list View
         mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, mTitle));
@@ -92,6 +109,18 @@ public class MainViewActivity extends AppCompatActivity {
                 CardListCreator.notifychangeddata();
             }
         });
+
+        // Animated circle loader
+        animatedCircleLoadingView.startIndeterminate();
+        MainViewActivity.animatedCircleLoadingView.setVisibility(View.VISIBLE);
+
+        // This code CREATES the entire list with CHECKS on network state
+        final CardListCreator cardListCreatorFragment = new CardListCreator();
+        if (getSupportFragmentManager().findFragmentByTag("main_list") == null) {
+                getSupportFragmentManager().beginTransaction().add(R.id.container, cardListCreatorFragment, "main_list").commit();
+                // Implement swipe to refresh
+            }
+        swipeToRefresh(cardListCreatorFragment);
     }
 
     @Override
@@ -104,16 +133,6 @@ public class MainViewActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.e("Class", "Resume");
-        Log.e("Boolean", String.valueOf(initialized));
-        // This code CREATES the entire list with CHECKS on network state
-        final CardListCreator cardListCreatorFragment = new CardListCreator();
-        if (getSupportFragmentManager().findFragmentById(R.id.container) == null) {
-            getSupportFragmentManager().beginTransaction().add(R.id.container, cardListCreatorFragment).commit();
-        } else {
-            getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(R.id.container));
-        }
-        // Implement swipe to refresh
-        swipeToRefresh(cardListCreatorFragment);
     }
 
     @Override
@@ -182,6 +201,9 @@ public class MainViewActivity extends AppCompatActivity {
     // Click listener for the drawer
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
 
+        public DrawerItemClickListener() {
+        }
+
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             selectItem(position);
@@ -204,11 +226,11 @@ public class MainViewActivity extends AppCompatActivity {
         }
 
     }
-    public class grabCard extends android.app.Fragment{
+    public class grabCard extends Fragment{
         public static final String ARG_FRAG_NO = "frag_no";
 
         public grabCard() {
-            //EMPTY AS REQUIRED
+            // EMPTY AS REQUIRED
         }
 
         // If 0, access DataBase parse class. If 1, access Archive parse class. If 2, remove & access settings
@@ -222,7 +244,8 @@ public class MainViewActivity extends AppCompatActivity {
             } else if (i==1){
                 LogonActivity.currentcard = 1;
             }
-            CardListCreator.clearadapter();
+            CardListCreator.adapter.clear();
+            CardListCreator.adapter = null;
             final CardListCreator cardListCreatorFragment = new CardListCreator();
             getSupportFragmentManager().beginTransaction().replace(R.id.container, cardListCreatorFragment).commit();
             swipeToRefresh(cardListCreatorFragment);
@@ -252,8 +275,6 @@ public class MainViewActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        // CardListCreator.clearadapter();
-        // getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(R.id.container)).commit();
         Log.e("Class", "Pause");
     }
 
@@ -261,6 +282,7 @@ public class MainViewActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.e("Class", "Destroy");
+        animatedCircleLoadingView.setVisibility(View.INVISIBLE);
     }
 
     // Network state check

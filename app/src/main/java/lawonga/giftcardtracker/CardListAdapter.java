@@ -2,7 +2,9 @@ package lawonga.giftcardtracker;
 
 
 import android.util.Log;
+import android.view.View;
 
+import com.github.jlmd.animatedcircleloadingview.AnimatedCircleLoadingView;
 import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
@@ -78,8 +80,12 @@ public class CardListAdapter {
                             CardListCreator.notifychangeddata();
                         }
                         Log.e("Current request", String.valueOf(LogonActivity.currentcard));
+                        MainViewActivity.animatedCircleLoadingView.stopOk();
+                        MainViewActivity.animatedCircleLoadingView.setVisibility(View.INVISIBLE);
                     } else {
                         Log.e("Local Datastore", e.toString());
+                        MainViewActivity.animatedCircleLoadingView.stopFailure();
+                        MainViewActivity.animatedCircleLoadingView.setVisibility(View.INVISIBLE);
                     }
                 }
             });
@@ -109,12 +115,16 @@ public class CardListAdapter {
                             objectID = object.getObjectId();
                             CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID));
                         }
+                        MainViewActivity.animatedCircleLoadingView.stopOk();
+                        MainViewActivity.animatedCircleLoadingView.setVisibility(View.INVISIBLE);
                     }
                     CardListCreator.notifychangeddata();
                     // Repins the updated data
                     ParseObject.pinAllInBackground(String.valueOf(cardTarget), parseObjects);
                 } else {
                     Log.e("Download Error ", e.toString());
+                    MainViewActivity.animatedCircleLoadingView.stopFailure();
+                    MainViewActivity.animatedCircleLoadingView.setVisibility(View.INVISIBLE);
                 }
             }
 

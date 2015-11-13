@@ -78,14 +78,14 @@ public class SettingsActivity extends AppCompatActivity{
                     ChangeEmailDialog changeEmailDialog= new ChangeEmailDialog();
                     changeEmailDialog.show(fragmentManager, "reset_email");
                 }
-
-
-                    // Logout code
+                // Logout code
                 if (position == 3) {
                     CardListCreator.clearadapter();
                     ParseUser.logOut();
                     if (ParseUser.getCurrentUser() == null) {
                         setResult(RESULT_OK, null);
+                        CardListCreator.clearadapter();
+                        CardListCreator.adapter = null;
                         startActivity(logoutIntent);
                         finish();
                     } else {

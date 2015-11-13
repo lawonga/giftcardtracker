@@ -3,6 +3,7 @@ package lawonga.giftcardtracker;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -15,27 +16,25 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.GetCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
+import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * Created by lawonga on 9/27/2015.
  */
 public class CardView extends AppCompatActivity {
+    Bitmap cardpicturefile;
     String cardname, cardId, cardNotes;
     int cardposition;
     double cardbalance;
@@ -43,6 +42,7 @@ public class CardView extends AppCompatActivity {
     public static TextView cardbalanceview;
     private EditText cardnotesview;
     private Button cardadd, cardsubtract;
+    private ImageView cardpicture;
     boolean networkstatus;
     public static boolean isNetworkConnected;
 
@@ -79,6 +79,7 @@ public class CardView extends AppCompatActivity {
         cardnotesview = (EditText)findViewById(R.id.note_view);
         cardadd = (Button) findViewById(R.id.card_add);
         cardsubtract = (Button) findViewById(R.id.card_subtract);
+        cardpicture = (ImageView) findViewById(R.id.card_picture);
 
         // Get data from CardListCreator
         Intent intent = getIntent();
@@ -88,6 +89,7 @@ public class CardView extends AppCompatActivity {
         cardNotes = intent.getStringExtra("cardnotes");
         cardbalance = intent.getDoubleExtra("cardbalance", cardbalance);
         networkstatus = intent.getBooleanExtra("networkstatus", true);
+        cardpicturefile = intent.getParcelableExtra("cardpicture");
 
         // Sets the texts from data we just got
         cardnameview.setText(cardname);
@@ -100,7 +102,7 @@ public class CardView extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
 
 
-        // Set the bundles so we dont duplicate code
+        // Set the bundles so we don't duplicate code
         final Bundle bundle = new Bundle();
         bundle.putString("cardname", cardname);
         bundle.putDouble("cardbalance", cardbalance);
@@ -131,6 +133,9 @@ public class CardView extends AppCompatActivity {
                 modify_card.show(modify_card_fm, "modify_card");
             }
         });
+
+        // Set the picture
+        cardpicture.setImageBitmap(cardpicturefile);
     }
 
     @Override
@@ -144,11 +149,11 @@ public class CardView extends AppCompatActivity {
             Toast.makeText(getApplication(), "Card Deleted", Toast.LENGTH_LONG).show();
         } else if (id == R.id.archive){
             // Create card in archive + delete card in cloud
-            NewCardFragment.createCard(nametxt, initialbalancetxt, "Archive", cardNotes, "Archive");
+            NewCardFragment.createCard(nametxt, initialbalancetxt, "Archive", cardNotes, "Archive", cardpicturefile);
             deleteCurrentCard();
             Toast.makeText(getApplication(), "Card Archived", Toast.LENGTH_LONG).show();
         } else if (id == R.id.unarchive){
-            NewCardFragment.createCard(nametxt, initialbalancetxt, "DataBase", cardNotes, "DataBase");
+            NewCardFragment.createCard(nametxt, initialbalancetxt, "DataBase", cardNotes, "DataBase", cardpicturefile);
             deleteCurrentCard();
             Toast.makeText(getApplication(), "Card Unarchived", Toast.LENGTH_LONG).show();
         } else if (id == android.R.id.home){

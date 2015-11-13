@@ -6,15 +6,19 @@
 
     <Button
         android:id="@+id/cancel_create_card"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_gravity="right"
-        android:text="Cancel" />
-
-
+        android:text="✕"
+        android:textStyle="bold"
+        android:textSize="24dp"
+        android:textColor="#FFFFFF"
+        android:background="@android:color/transparent"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -107,6 +111,8 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
-        android:text="Create Card" />
+        android:text="Create Card"
+        android:background="@color/secondaryColor"
+        android:textColor="#FFFFFF"/>
 
 </RelativeLayout>

@@ -27,9 +27,11 @@ public class CardListCreator extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        CardListAdapter.queryList();
         // Custom View Layout
-        adapter = new CustomAdapter(getActivity(), cardData);
+        if (adapter == null) {
+            CardListAdapter.queryList();
+            adapter = new CustomAdapter(getActivity(), cardData);
+        }
         setListAdapter(adapter);
     }
 

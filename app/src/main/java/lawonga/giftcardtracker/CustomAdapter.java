@@ -2,6 +2,7 @@ package lawonga.giftcardtracker;
 
 import android.content.Context;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +43,6 @@ public class CustomAdapter extends ArrayAdapter<CardListAdapter> {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Integer.valueOf((int) (currentWidth*0.45)));
         cardPic.setLayoutParams(layoutParams);
         cardPic.setImageResource(R.drawable.restaurant);
-
 
         return convertView;
     }
