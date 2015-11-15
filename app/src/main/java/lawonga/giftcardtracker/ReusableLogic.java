@@ -1,5 +1,6 @@
 package lawonga.giftcardtracker;
 
+import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
 import android.view.Display;
 
@@ -34,5 +35,12 @@ public class ReusableLogic {
         int intWidth = Integer.valueOf((int) dpWidth);
 
         return intWidth;
+    }
+
+    public void disposeBitmap(Bitmap bitmap){
+        if (bitmap != null){
+            bitmap.recycle();
+            bitmap = null;
+        }
     }
 }

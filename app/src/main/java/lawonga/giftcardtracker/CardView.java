@@ -8,13 +8,14 @@ import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,7 +28,6 @@ import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,10 +47,14 @@ public class CardView extends AppCompatActivity {
     private ImageView cardpicture;
     boolean networkstatus;
     public static boolean isNetworkConnected;
+    Toolbar toolbar;
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        // Checks to see if we're in archived cards or my cards
+        /* Checks to see if we're in archived cards or my cards
+        if LogonActivity.currentcard = 0, then it means we are in my cards
+        if LogonActivity.currentcard = 1, then it means we are in archive
+         */
         MenuItem archiveMenu = menu.findItem(R.id.archive);
         MenuItem unarchiveMenu = menu.findItem(R.id.unarchive);
         if (LogonActivity.currentcard == 1) {
@@ -67,12 +71,11 @@ public class CardView extends AppCompatActivity {
         return true;
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // MainViewActivity.active = false;
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.card_layout);
 
         // Initialize stuff
@@ -82,6 +85,7 @@ public class CardView extends AppCompatActivity {
         cardadd = (Button) findViewById(R.id.card_add);
         cardsubtract = (Button) findViewById(R.id.card_subtract);
         cardpicture = (ImageView) findViewById(R.id.card_picture);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         // Get data from CardListCreator
         Intent intent = getIntent();
@@ -104,10 +108,11 @@ public class CardView extends AppCompatActivity {
         cardnotesview.setText(cardNotes);
 
         // Enables action bar & home button
-        setTitle(cardname);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-
+        CollapsingToolbarLayout collapsingToolBar = (CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar);
+        collapsingToolBar.setTitle(cardname);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setTitle(cardname);
 
         // Set the bundles so we don't duplicate code
         final Bundle bundle = new Bundle();
@@ -145,6 +150,12 @@ public class CardView extends AppCompatActivity {
         cardpicture.setImageBitmap(cardpicturebmp);
     }
 
+    /* This method does the option items
+    if delete = do a delete card
+    if archive = delete the card in DataBase and recreate the card in Archive
+    if unarchive = deletes the card in Archive and recreate the card in Delete
+    if home (press back navigation) it goes home
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -171,6 +182,7 @@ public class CardView extends AppCompatActivity {
         return false;
     }
 
+    // This method is for the deleteCurrentCard
     public void deleteCurrentCard(){
         // Delete card in cloud
         Map<String, Object> map = new HashMap<>();
@@ -206,6 +218,7 @@ public class CardView extends AppCompatActivity {
         }
     }
 
+    // On back press, we save data to cloud, and if network is not connected then we query the list again (to reflect that we're not connected to a network)
     @Override
     public void onBackPressed() {
         super.onBackPressed();

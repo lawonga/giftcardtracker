@@ -31,6 +31,8 @@ public class CardListAdapter {
     public double cardbalance;
     static String accesslocation;
     public Bitmap cardpic;
+    // This one is the finished cardpic
+    public static Bitmap cardPic;
     public CardListAdapter(String cardname, double cardbalance, String cardnotes, String objectId, Bitmap cardpic){
         this.cardname = cardname;
         this.cardbalance = cardbalance;
@@ -83,7 +85,7 @@ public class CardListAdapter {
                         for (ParseObject object : list) {
                             String cardnameobject, objectID, currentCardNotes;
                             Double cardnamebalance;
-                            Bitmap cardpic = null;
+                            cardPic = null;
                             cardnameobject = object.getString("cardname");
                             currentCardNotes = object.getString("cardnotes");
                             cardnamebalance = object.getDouble("balance");
@@ -93,15 +95,15 @@ public class CardListAdapter {
                             if (parseFile != null) {
                                 try {
                                     byte[] data = parseFile.getData();
-                                    cardpic = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                    cardPic = BitmapFactory.decodeByteArray(data, 0, data.length);
                                     Log.e("Success", "Picture decoded!");
                                 } catch (ParseException e1) {
-                                    cardpic = BitmapFactory.decodeResource(Resources.getSystem(), R.drawable.gas);
+                                    cardPic = BitmapFactory.decodeResource(Resources.getSystem(), R.drawable.gas);
                                     Log.e("Fail", "Picture failed to decode :(");
                                     e1.printStackTrace();
                                 }
                             }
-                            CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID, cardpic));
+                            CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID, cardPic));
                             CardListCreator.notifychangeddata();
                         }
                         Log.e("Current request", String.valueOf(LogonActivity.currentcard));
@@ -135,7 +137,7 @@ public class CardListAdapter {
                             // PER card has different data, hence why these are placed in here
                             String cardnameobject, objectID, currentCardNotes;
                             Double cardnamebalance;
-                            Bitmap cardpic = null;
+                            cardPic = null;
                             cardnameobject = object.getString("cardname");
                             cardnamebalance = object.getDouble("balance");
                             currentCardNotes = object.getString("cardnotes");
@@ -144,15 +146,15 @@ public class CardListAdapter {
                             if (parseFile != null) {
                                 try {
                                     byte[] data = parseFile.getData();
-                                    cardpic = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                    cardPic = BitmapFactory.decodeByteArray(data, 0, data.length);
                                     Log.e("Success", "Picture decoded!");
                                 } catch (ParseException e1) {
-                                    cardpic = BitmapFactory.decodeResource(Resources.getSystem(), R.drawable.gas);
+                                    cardPic = BitmapFactory.decodeResource(Resources.getSystem(), R.drawable.gas);
                                     e1.printStackTrace();
                                     Log.e("Fail", "Picture decode failed :(!");
                                 }
                             }
-                            CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID, cardpic));
+                            CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID, cardPic));
                         }
                         MainViewActivity.animatedCircleLoadingView.stopOk();
                         MainViewActivity.animatedCircleLoadingView.setVisibility(View.INVISIBLE);

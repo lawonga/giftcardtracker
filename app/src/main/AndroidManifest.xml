@@ -34,7 +34,8 @@
         <activity
             android:name=".CardView"
             android:label="@string/card_name"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <activity
             android:screenOrientation="portrait"
             android:name=".SettingsActivity"

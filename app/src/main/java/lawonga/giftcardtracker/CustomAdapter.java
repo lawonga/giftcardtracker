@@ -1,6 +1,7 @@
 package lawonga.giftcardtracker;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,12 +40,11 @@ public class CustomAdapter extends ArrayAdapter<CardListAdapter> {
 
 
         int currentWidth = displayMetrics.widthPixels;
-
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Integer.valueOf((int) (currentWidth*0.45)));
+
+        // Set image bitmap
         cardPic.setLayoutParams(layoutParams);
         cardPic.setImageBitmap(carddatas.cardpic);
-
         return convertView;
     }
-
 }

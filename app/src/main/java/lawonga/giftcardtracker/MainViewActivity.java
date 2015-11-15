@@ -308,6 +308,8 @@ public class MainViewActivity extends AppCompatActivity {
                                 networkStatus = isNetworkConnected();
                                 CardListCreator.clearadapter();
                                 CardListAdapter.queryList();
+                                if (!networkStatus) fab.setVisibility(View.GONE);
+                                else fab.setVisibility(View.VISIBLE);
                                 swipeRefreshLayout.setRefreshing(false);
                             }
                         });

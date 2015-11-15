@@ -80,8 +80,6 @@ public class NewCardFragment extends DialogFragment {
         cancel = (Button) view.findViewById(R.id.cancel_create_card);
         // SliderLayout is the Android Image Slider
         sliderShow = (SliderLayout) view.findViewById(R.id.slider);
-        sliderShow.setDuration(Integer.MAX_VALUE);
-        sliderShow.setCustomIndicator((PagerIndicator) view.findViewById(R.id.custom_indicator));
 
         // Set card list
         cardMap = new HashMap<>();
@@ -109,6 +107,8 @@ public class NewCardFragment extends DialogFragment {
                             }
                         }
                     });
+            sliderShow.setDuration(Integer.MAX_VALUE);
+            sliderShow.setCustomIndicator((PagerIndicator) view.findViewById(R.id.custom_indicator));
             sliderShow.addSlider(textSliderView);
         }
 
@@ -268,23 +268,38 @@ public class NewCardFragment extends DialogFragment {
             }
         });
     }
-    public static void createCardNotConnected(final String nametext, final String initialbalancetext, String databaseclass, String cardnotes, String cardtype, final Bitmap picture) {
+    public static void createCardNotConnected(final String nametext, final String initialbalancetext, String databaseclass, final String cardnotes, final String cardtype, final Bitmap picture) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         picture.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] byteArray = stream.toByteArray();
-        final ParseObject parseObject = new ParseObject(cardtype);
-        parseObject.put("cardname", nametext);
-        parseObject.put("balance", Double.valueOf(initialbalancetext));
-        parseObject.put("cardnotes", cardnotes);
-        parseObject.put("user", ParseUser.getCurrentUser());
-        parseObject.put("cardpicture", byteArray);
-        parseObject.pinInBackground(String.valueOf(LogonActivity.currentcard), new SaveCallback() {
+        final ParseFile parseFile = new ParseFile("photo.png", byteArray);
+        parseFile.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                CardListCreator.cardData.add(new CardListAdapter(nametext, Double.valueOf(initialbalancetext), "", parseObject.getObjectId(), picture));
-                CardListCreator.notifychangeddata();
-                parseObject.saveEventually();
-                Log.e("Internet", "is not running");
+                if (e != null) {
+                    final ParseObject parseObject = new ParseObject(cardtype);
+                    parseObject.put("cardname", nametext);
+                    parseObject.put("balance", Double.valueOf(initialbalancetext));
+                    parseObject.put("cardnotes", cardnotes);
+                    parseObject.put("user", ParseUser.getCurrentUser());
+                    parseObject.put("cardpicture", parseFile);
+                    parseObject.pinInBackground(String.valueOf(LogonActivity.currentcard), new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            CardListCreator.cardData.add(new CardListAdapter(nametext, Double.valueOf(initialbalancetext), "", parseObject.getObjectId(), picture));
+                            CardListCreator.notifychangeddata();
+                            parseObject.saveEventually(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e == null) Log.e("Pin Save", "Success");
+                                    else Log.e("Pin Save", e.toString());
+                                }
+                            });
+                            if (e == null) Log.e("Sucess.. but internet", "is not running");
+                            else Log.e("Fail.. ", e.toString());
+                        }
+                    });
+                }
             }
         });
         }
