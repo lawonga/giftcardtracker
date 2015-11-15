@@ -42,7 +42,7 @@ public class CustomAdapter extends ArrayAdapter<CardListAdapter> {
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Integer.valueOf((int) (currentWidth*0.45)));
         cardPic.setLayoutParams(layoutParams);
-        cardPic.setImageResource(R.drawable.restaurant);
+        cardPic.setImageBitmap(carddatas.cardpic);
 
         return convertView;
     }

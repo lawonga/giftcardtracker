@@ -1,14 +1,19 @@
 package lawonga.giftcardtracker;
 
 
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.View;
 
 import com.github.jlmd.animatedcircleloadingview.AnimatedCircleLoadingView;
 import com.parse.FindCallback;
 import com.parse.FunctionCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -25,11 +30,13 @@ public class CardListAdapter {
     public String cardname, cardnotes, objectId;
     public double cardbalance;
     static String accesslocation;
-    public CardListAdapter(String cardname, double cardbalance, String cardnotes, String objectId){
+    public Bitmap cardpic;
+    public CardListAdapter(String cardname, double cardbalance, String cardnotes, String objectId, Bitmap cardpic){
         this.cardname = cardname;
         this.cardbalance = cardbalance;
         this.objectId = objectId;
         this.cardnotes = cardnotes;
+        this.cardpic = cardpic;
     }
 
     public String getCardName(){
@@ -37,6 +44,9 @@ public class CardListAdapter {
     }
     public double getCardBalance(){
         return cardbalance;
+    }
+    public Bitmap getCardPic(){
+        return cardpic;
     }
     public String getObjectId(){
         if (objectId == null){
@@ -62,6 +72,7 @@ public class CardListAdapter {
             cloudQuery(0);
             cloudQuery(1);
         } else if (!MainViewActivity.networkStatus || !CardView.isNetworkConnected) {
+            // IF NOT CONNECTED
             ParseQuery<ParseObject> query = ParseQuery.getQuery(accesslocation);
             query.orderByAscending("cardname");
             query.fromPin(String.valueOf(LogonActivity.currentcard));
@@ -72,11 +83,25 @@ public class CardListAdapter {
                         for (ParseObject object : list) {
                             String cardnameobject, objectID, currentCardNotes;
                             Double cardnamebalance;
+                            Bitmap cardpic = null;
                             cardnameobject = object.getString("cardname");
                             currentCardNotes = object.getString("cardnotes");
                             cardnamebalance = object.getDouble("balance");
                             objectID = object.getObjectId();
-                            CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID));
+                            // Bitmap stuff
+                            ParseFile parseFile = object.getParseFile("cardpicture");
+                            if (parseFile != null) {
+                                try {
+                                    byte[] data = parseFile.getData();
+                                    cardpic = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                    Log.e("Success", "Picture decoded!");
+                                } catch (ParseException e1) {
+                                    cardpic = BitmapFactory.decodeResource(Resources.getSystem(), R.drawable.gas);
+                                    Log.e("Fail", "Picture failed to decode :(");
+                                    e1.printStackTrace();
+                                }
+                            }
+                            CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID, cardpic));
                             CardListCreator.notifychangeddata();
                         }
                         Log.e("Current request", String.valueOf(LogonActivity.currentcard));
@@ -93,6 +118,7 @@ public class CardListAdapter {
         }
     }
 
+    // IF INTERNET IS CONNECTED
     public static void cloudQuery(final int cardTarget){
         // Querys list from the cloudcode via retrievecard.js; retrieves all card
         Map<String, Object> map = new HashMap<>(2);
@@ -109,11 +135,24 @@ public class CardListAdapter {
                             // PER card has different data, hence why these are placed in here
                             String cardnameobject, objectID, currentCardNotes;
                             Double cardnamebalance;
+                            Bitmap cardpic = null;
                             cardnameobject = object.getString("cardname");
                             cardnamebalance = object.getDouble("balance");
                             currentCardNotes = object.getString("cardnotes");
                             objectID = object.getObjectId();
-                            CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID));
+                            ParseFile parseFile = object.getParseFile("cardpicture");
+                            if (parseFile != null) {
+                                try {
+                                    byte[] data = parseFile.getData();
+                                    cardpic = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                    Log.e("Success", "Picture decoded!");
+                                } catch (ParseException e1) {
+                                    cardpic = BitmapFactory.decodeResource(Resources.getSystem(), R.drawable.gas);
+                                    e1.printStackTrace();
+                                    Log.e("Fail", "Picture decode failed :(!");
+                                }
+                            }
+                            CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID, cardpic));
                         }
                         MainViewActivity.animatedCircleLoadingView.stopOk();
                         MainViewActivity.animatedCircleLoadingView.setVisibility(View.INVISIBLE);

@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -34,7 +35,8 @@ import java.util.Map;
  * Created by lawonga on 9/27/2015.
  */
 public class CardView extends AppCompatActivity {
-    Bitmap cardpicturefile;
+    Bitmap cardpicturebmp;
+    byte[] cardpicturefile;
     String cardname, cardId, cardNotes;
     int cardposition;
     double cardbalance;
@@ -89,7 +91,12 @@ public class CardView extends AppCompatActivity {
         cardNotes = intent.getStringExtra("cardnotes");
         cardbalance = intent.getDoubleExtra("cardbalance", cardbalance);
         networkstatus = intent.getBooleanExtra("networkstatus", true);
-        cardpicturefile = intent.getParcelableExtra("cardpicture");
+        cardpicturefile = intent.getByteArrayExtra("cardpicture");
+
+        // Bitmap decoding
+        if (cardpicturefile != null) {
+            cardpicturebmp = BitmapFactory.decodeByteArray(cardpicturefile, 0, cardpicturefile.length);
+        }
 
         // Sets the texts from data we just got
         cardnameview.setText(cardname);
@@ -135,7 +142,7 @@ public class CardView extends AppCompatActivity {
         });
 
         // Set the picture
-        cardpicture.setImageBitmap(cardpicturefile);
+        cardpicture.setImageBitmap(cardpicturebmp);
     }
 
     @Override
@@ -149,11 +156,11 @@ public class CardView extends AppCompatActivity {
             Toast.makeText(getApplication(), "Card Deleted", Toast.LENGTH_LONG).show();
         } else if (id == R.id.archive){
             // Create card in archive + delete card in cloud
-            NewCardFragment.createCard(nametxt, initialbalancetxt, "Archive", cardNotes, "Archive", cardpicturefile);
+            NewCardFragment.createCard(nametxt, initialbalancetxt, "Archive", cardNotes, "Archive", cardpicturebmp);
             deleteCurrentCard();
             Toast.makeText(getApplication(), "Card Archived", Toast.LENGTH_LONG).show();
         } else if (id == R.id.unarchive){
-            NewCardFragment.createCard(nametxt, initialbalancetxt, "DataBase", cardNotes, "DataBase", cardpicturefile);
+            NewCardFragment.createCard(nametxt, initialbalancetxt, "DataBase", cardNotes, "DataBase", cardpicturebmp);
             deleteCurrentCard();
             Toast.makeText(getApplication(), "Card Unarchived", Toast.LENGTH_LONG).show();
         } else if (id == android.R.id.home){

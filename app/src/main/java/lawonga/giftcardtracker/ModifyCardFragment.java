@@ -83,6 +83,8 @@ public class ModifyCardFragment extends DialogFragment {
                                   Log.e("Error: ", e.toString());
                                   Toast.makeText(getActivity(), "Unknown Error", Toast.LENGTH_LONG).show();
                               }
+                              CardListCreator.clearadapter();
+                              CardListAdapter.queryList();
                               dismiss();
                           }
                       });
@@ -90,6 +92,8 @@ public class ModifyCardFragment extends DialogFragment {
                       ParseObject point = ParseObject.createWithoutData("DataBase", cardId);
                       point.put("balance", finalcardvalue);
                       point.saveEventually();
+                      CardListCreator.clearadapter();
+                      CardListAdapter.queryList();
                       dismiss();
                   }
               }

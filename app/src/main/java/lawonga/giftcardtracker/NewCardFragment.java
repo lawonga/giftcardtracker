@@ -268,7 +268,7 @@ public class NewCardFragment extends DialogFragment {
             }
         });
     }
-    public static void createCardNotConnected(final String nametext, final String initialbalancetext, String databaseclass, String cardnotes, String cardtype, Bitmap picture) {
+    public static void createCardNotConnected(final String nametext, final String initialbalancetext, String databaseclass, String cardnotes, String cardtype, final Bitmap picture) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         picture.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] byteArray = stream.toByteArray();
@@ -281,7 +281,7 @@ public class NewCardFragment extends DialogFragment {
         parseObject.pinInBackground(String.valueOf(LogonActivity.currentcard), new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                CardListCreator.cardData.add(new CardListAdapter(nametext, Double.valueOf(initialbalancetext), "", parseObject.getObjectId()));
+                CardListCreator.cardData.add(new CardListAdapter(nametext, Double.valueOf(initialbalancetext), "", parseObject.getObjectId(), picture));
                 CardListCreator.notifychangeddata();
                 parseObject.saveEventually();
                 Log.e("Internet", "is not running");

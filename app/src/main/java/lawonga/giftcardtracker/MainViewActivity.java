@@ -42,9 +42,9 @@ public class MainViewActivity extends AppCompatActivity {
     private FloatingActionButton fab;
     public static SwipeRefreshLayout swipeRefreshLayout;
     public static AnimatedCircleLoadingView animatedCircleLoadingView;
+
     // Register global network connectivity
     public static boolean networkStatus;
-    private boolean isRunning = false;
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -75,7 +75,6 @@ public class MainViewActivity extends AppCompatActivity {
         fab = (FloatingActionButton)findViewById(R.id.fab);
         animatedCircleLoadingView = (AnimatedCircleLoadingView)findViewById(R.id.circle_loading_view);
         LogonActivity.currentcard = 0;
-
 
         // Set the Adapter for list View
         mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, mTitle));
@@ -233,7 +232,7 @@ public class MainViewActivity extends AppCompatActivity {
             // EMPTY AS REQUIRED
         }
 
-        // If 0, access DataBase parse class. If 1, access Archive parse class. If 2, remove & access settings
+        // If 0, access DataBase parse class. If 1, access Archive parse class.
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.reuseable_fragment_layout, container, false);
             int i = getArguments().getInt(ARG_FRAG_NO);

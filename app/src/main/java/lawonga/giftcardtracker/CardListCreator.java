@@ -1,6 +1,7 @@
 package lawonga.giftcardtracker;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 /**
@@ -59,6 +61,16 @@ public class CardListCreator extends ListFragment {
         Double cardbalance = cardData.get(position).getCardBalance();
         String cardnotes = cardData.get(position).getCardNotes();
         String cardId = cardData.get(position).getObjectId();
+        Bitmap cardpic = cardData.get(position).getCardPic();
+        byte[] byteArray = null;
+        // Convert cardpic to bytearray into intent
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        if(cardpic != null) {
+            cardpic.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byteArray = stream.toByteArray();
+        }
+
+
         Intent intent = new Intent(v.getContext(), CardView.class);
         intent.putExtra("networkstatus", MainViewActivity.networkStatus);
         intent.putExtra("cardposition", position);
@@ -66,6 +78,7 @@ public class CardListCreator extends ListFragment {
         intent.putExtra("cardname", cardname);
         intent.putExtra("cardId", cardId);
         intent.putExtra("cardnotes", cardnotes);
+        intent.putExtra("cardpicture", byteArray);
         startActivity(intent);
     }
 }
