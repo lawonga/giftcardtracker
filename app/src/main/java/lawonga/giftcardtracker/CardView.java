@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -37,12 +39,12 @@ import java.util.Map;
 public class CardView extends AppCompatActivity {
     Bitmap cardpicturebmp;
     byte[] cardpicturefile;
-    String cardname, cardId, cardNotes;
+    String cardname, cardId, cardNotes, cardcode;
     int cardposition;
     double cardbalance;
     private TextView cardnameview;
     public static TextView cardbalanceview;
-    private EditText cardnotesview;
+    private EditText cardnotesview, cardcodeET;
     private Button cardadd, cardsubtract;
     private ImageView cardpicture;
     boolean networkstatus;
@@ -78,6 +80,10 @@ public class CardView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // MainViewActivity.active = false;
         setContentView(R.layout.card_layout);
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(getResources().getColor(R.color.pureBlack));
 
         // Initialize stuff
         cardnameview = (TextView) findViewById(R.id.card_name);
@@ -86,6 +92,7 @@ public class CardView extends AppCompatActivity {
         cardadd = (Button) findViewById(R.id.card_add);
         cardsubtract = (Button) findViewById(R.id.card_subtract);
         cardpicture = (ImageView) findViewById(R.id.card_picture);
+        cardcodeET = (EditText)findViewById(R.id.card_code);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         // Get data from CardListCreator
@@ -97,6 +104,7 @@ public class CardView extends AppCompatActivity {
         cardbalance = intent.getDoubleExtra("cardbalance", cardbalance);
         networkstatus = intent.getBooleanExtra("networkstatus", true);
         cardpicturefile = intent.getByteArrayExtra("cardpicture");
+        cardcode = intent.getStringExtra("cardcode");
 
         // Bitmap decoding
         if (cardpicturefile != null) {
@@ -107,6 +115,7 @@ public class CardView extends AppCompatActivity {
         cardnameview.setText(cardname);
         cardbalanceview.setText(Double.toString(cardbalance));
         cardnotesview.setText(cardNotes);
+        cardcodeET.setText(cardcode);
 
         // Enables action bar & home button
         collapsingToolBar = (CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar);
@@ -182,11 +191,11 @@ public class CardView extends AppCompatActivity {
             Toast.makeText(getApplication(), "Card Deleted", Toast.LENGTH_LONG).show();
         } else if (id == R.id.archive){
             // Create card in archive + delete card in cloud
-            NewCardFragment.createCard(nametxt, initialbalancetxt, "Archive", cardNotes, "Archive", cardpicturebmp);
+            NewCardFragment.createCard(nametxt, initialbalancetxt, "Archive", cardNotes, "Archive", cardpicturebmp, cardcode);
             deleteCurrentCard();
             Toast.makeText(getApplication(), "Card Archived", Toast.LENGTH_LONG).show();
         } else if (id == R.id.unarchive){
-            NewCardFragment.createCard(nametxt, initialbalancetxt, "DataBase", cardNotes, "DataBase", cardpicturebmp);
+            NewCardFragment.createCard(nametxt, initialbalancetxt, "DataBase", cardNotes, "DataBase", cardpicturebmp, cardcode);
             deleteCurrentCard();
             Toast.makeText(getApplication(), "Card Unarchived", Toast.LENGTH_LONG).show();
         } else if (id == android.R.id.home){
@@ -240,13 +249,17 @@ public class CardView extends AppCompatActivity {
         // Saves data to cloud (forcefully, without getting object first, using pointers)
         ParseObject point = ParseObject.createWithoutData("DataBase", cardId);
         point.put("cardnotes", cardnotesview.getText().toString());
+        point.put("cardcode", cardcodeET.getText().toString());
         point.saveEventually();
         Log.e ("Isnetworkconnected", String.valueOf(isNetworkConnected()));
-        Log.e ("networkstatus", String.valueOf(networkstatus));
+        Log.e("networkstatus", String.valueOf(networkstatus));
         isNetworkConnected = isNetworkConnected();
         if (networkstatus && !isNetworkConnected){
             CardListAdapter.queryList();
             Log.e("networkstatus", "!isnetworkconnected");
+        } else {
+            CardListCreator.cardData.get(cardposition).cardnotes = cardnotesview.getText().toString();
+            CardListCreator.cardData.get(cardposition).cardcode = cardcodeET.getText().toString();
         }
     }
 

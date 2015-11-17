@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:layout_centerHorizontal="true"
     android:orientation="vertical"
-    android:layout_margin="20dp">
+    android:padding="20dp">
 
     <TextView
         android:text="Amount"
@@ -28,12 +28,17 @@
         android:layout_height="match_parent"
         android:text="Cancel"
         android:id="@+id/modify_cancel"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:background="@drawable/buttonshapesmall"
+        android:textColor="@drawable/buttonshamesmallcolor"/>
     <Button
+        android:layout_marginLeft="10dp"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:text="OK"
         android:id="@+id/modify_ok"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:background="@drawable/buttonshapesmall"
+        android:textColor="@drawable/buttonshamesmallcolor"/>
     </LinearLayout>
 </LinearLayout>

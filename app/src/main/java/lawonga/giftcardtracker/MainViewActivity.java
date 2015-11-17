@@ -26,6 +26,7 @@ import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toolbar;
 
@@ -42,6 +43,7 @@ public class MainViewActivity extends AppCompatActivity {
     private FloatingActionButton fab;
     public static SwipeRefreshLayout swipeRefreshLayout;
     public static AnimatedCircleLoadingView animatedCircleLoadingView;
+    public static LinearLayout showIfBlank;
 
     // Register global network connectivity
     public static boolean networkStatus;
@@ -49,7 +51,7 @@ public class MainViewActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        MainViewActivity.animatedCircleLoadingView.setVisibility(View.INVISIBLE);
+        // animatedCircleLoadingView.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -74,6 +76,7 @@ public class MainViewActivity extends AppCompatActivity {
         swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.main_swipeContainer);
         fab = (FloatingActionButton)findViewById(R.id.fab);
         animatedCircleLoadingView = (AnimatedCircleLoadingView)findViewById(R.id.circle_loading_view);
+        showIfBlank = (LinearLayout)findViewById(R.id.showIfBlank);
         LogonActivity.currentcard = 0;
 
         // Set the Adapter for list View
@@ -110,15 +113,19 @@ public class MainViewActivity extends AppCompatActivity {
         });
 
         // Animated circle loader
-        animatedCircleLoadingView.startIndeterminate();
-        MainViewActivity.animatedCircleLoadingView.setVisibility(View.VISIBLE);
+        // animatedCircleLoadingView.startIndeterminate();
+        // animatedCircleLoadingView.setVisibility(View.VISIBLE);
+
 
         // This code CREATES the entire list with CHECKS on network state
         final CardListCreator cardListCreatorFragment = new CardListCreator();
+
+        // ADD the list in
         if (getSupportFragmentManager().findFragmentByTag("main_list") == null) {
                 getSupportFragmentManager().beginTransaction().add(R.id.container, cardListCreatorFragment, "main_list").commit();
-                // Implement swipe to refresh
             }
+
+        // Implement swipe to refresh
         swipeToRefresh(cardListCreatorFragment);
     }
 
@@ -281,7 +288,7 @@ public class MainViewActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.e("Class", "Destroy");
-        animatedCircleLoadingView.setVisibility(View.INVISIBLE);
+        // animatedCircleLoadingView.setVisibility(View.INVISIBLE);
     }
 
     // Network state check
@@ -308,7 +315,7 @@ public class MainViewActivity extends AppCompatActivity {
                                 networkStatus = isNetworkConnected();
                                 CardListCreator.clearadapter();
                                 CardListAdapter.queryList();
-                                if (!networkStatus) fab.setVisibility(View.GONE);
+                                if (!networkStatus || !isNetworkConnected()) fab.setVisibility(View.GONE);
                                 else fab.setVisibility(View.VISIBLE);
                                 swipeRefreshLayout.setRefreshing(false);
                             }

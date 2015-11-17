@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -57,7 +58,7 @@ public class SettingsActivity extends AppCompatActivity{
 
         final ListView settingListView = (ListView)findViewById(R.id.listview_settings);
         //
-        String[] menuitems= new String[] {"Change Password", "Change Email", "Account Management", "Logout"};
+        String[] menuitems= new String[] {"Change Password", "Change Email", "Logout", "About Cardify"};
         final ArrayList<String> settinglist = new ArrayList<>();
         for (int i=0; i<menuitems.length; i++){
             settinglist.add(menuitems[i]);
@@ -78,8 +79,17 @@ public class SettingsActivity extends AppCompatActivity{
                     ChangeEmailDialog changeEmailDialog= new ChangeEmailDialog();
                     changeEmailDialog.show(fragmentManager, "reset_email");
                 }
+                if(position == 3){
+                    Intent intent = new Intent(SettingsActivity.this, Credits.class);
+                    startActivity(intent);
+                }
                 // Logout code
-                if (position == 3) {
+                if (position == 2) {
+                    try {
+                        ParseObject.unpinAll();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                     CardListCreator.clearadapter();
                     ParseUser.logOut();
                     if (ParseUser.getCurrentUser() == null) {

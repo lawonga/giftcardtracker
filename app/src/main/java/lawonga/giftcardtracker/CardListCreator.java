@@ -62,6 +62,7 @@ public class CardListCreator extends ListFragment {
         String cardnotes = cardData.get(position).getCardNotes();
         String cardId = cardData.get(position).getObjectId();
         Bitmap cardpic = cardData.get(position).getCardPic();
+        String cardcode = cardData.get(position).getCardCode();
         byte[] byteArray = null;
         // Convert cardpic to bytearray into intent
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -79,6 +80,7 @@ public class CardListCreator extends ListFragment {
         intent.putExtra("cardId", cardId);
         intent.putExtra("cardnotes", cardnotes);
         intent.putExtra("cardpicture", byteArray);
+        intent.putExtra("cardcode", cardcode);
         startActivity(intent);
     }
 }

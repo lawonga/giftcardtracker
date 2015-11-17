@@ -5,5 +5,6 @@
     <item android:id="@+id/logout" android:title="@string/logout"
         android:orderInCategory="102" app:showAsAction="never" android:visible="false"/>
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="101" app:showAsAction="never"/>
+        android:orderInCategory="101" app:showAsAction="always"
+        android:icon="@drawable/ic_settings_white_48dp"/>
 </menu>

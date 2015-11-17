@@ -2,6 +2,9 @@
 <resources>
     <color name="transparent">#000000</color>
     <color name="secondaryColor">#222267</color>
+    <color name="darkGrey">#333333</color>
+    <color name="whiteSpecial">#FFFEEE</color>
+    <color name="pureBlack">#000000</color>
 
 
 

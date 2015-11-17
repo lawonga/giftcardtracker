@@ -50,5 +50,8 @@
         android:layout_height="wrap_content"
         android:text="Register"
         android:id="@+id/register_button"
+        android:shadowColor="@color/whiteSpecial"
+        android:background="@drawable/buttonshapesmall"
+        android:textColor="@drawable/buttonshamesmallcolor"
  />
 </LinearLayout>

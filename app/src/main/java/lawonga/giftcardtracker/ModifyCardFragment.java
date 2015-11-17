@@ -62,7 +62,8 @@ public class ModifyCardFragment extends DialogFragment {
             addorsubtract_textview.setText("Enter new card name");
             addorsubtract_edittextview.setInputType(InputType.TYPE_CLASS_TEXT);
             addorsubtract_edittextview.setText(cardname);
-        }
+        } else if (add_or_subtract == 0) addorsubtract_textview.setText("Reload Amount");
+        else if (add_or_subtract == 1) addorsubtract_textview.setText("Pay Amount");
 
                 // Set aciton for when user opens the fragment
         addorsubctract_add.setOnClickListener(new View.OnClickListener() {
@@ -74,9 +75,9 @@ public class ModifyCardFragment extends DialogFragment {
                   }
                   // Use add_or_subtract boolean value to determine whether to add or subtract; if true = add
                   if (add_or_subtract == 0) {
-                      finalcardmodifier = Double.valueOf(Math.round(Double.valueOf(addorsubtract_edittextview.getText().toString())*100)/100);
+                      finalcardmodifier = Math.round(Double.valueOf(addorsubtract_edittextview.getText().toString()) * 100.0) / 100.0;
                   } else if (add_or_subtract == 1){
-                      finalcardmodifier = Double.valueOf(Math.round(Double.valueOf(addorsubtract_edittextview.getText().toString())*-100)/100);
+                      finalcardmodifier = Math.round(Double.valueOf(addorsubtract_edittextview.getText().toString()) * -100.0) / 100.0;
                   } else if (add_or_subtract == 2){
                       // If editing the card name
                   }

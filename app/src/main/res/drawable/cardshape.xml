@@ -4,4 +4,9 @@
     <solid android:color="@android:color/white"/>
     <corners
         android:radius="20dp"/>
+    <gradient
+        android:angle="180"
+        />
+    <stroke android:width="3dp"
+        android:color="#BABABA"/>
 </shape>

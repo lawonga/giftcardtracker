@@ -45,10 +45,10 @@ public class LogonActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        new ParseInitialization();
+    protected void onStart() {
+        super.onStart();
 
+        new ParseInitialization();
 
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
@@ -110,6 +110,7 @@ public class LogonActivity extends AppCompatActivity {
                             } else {
                                 Toast.makeText(getApplicationContext(), "Sorry, your username or password is incorrect.", Toast.LENGTH_LONG).show();
                                 login.setEnabled(true);
+                                forgotpassword.setEnabled(true);
                             }
                         }
                     });
@@ -119,6 +120,7 @@ public class LogonActivity extends AppCompatActivity {
             }
         });
     }
+
 
     public class ResetEmailDialog extends DialogFragment {
         @Override
