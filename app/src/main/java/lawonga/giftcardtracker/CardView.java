@@ -47,7 +47,8 @@ public class CardView extends AppCompatActivity {
     private ImageView cardpicture;
     boolean networkstatus;
     public static boolean isNetworkConnected;
-    Toolbar toolbar;
+    public static Toolbar toolbar;
+    public static CollapsingToolbarLayout collapsingToolBar;
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -108,7 +109,7 @@ public class CardView extends AppCompatActivity {
         cardnotesview.setText(cardNotes);
 
         // Enables action bar & home button
-        CollapsingToolbarLayout collapsingToolBar = (CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar);
+        collapsingToolBar = (CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar);
         collapsingToolBar.setTitle(cardname);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
@@ -128,11 +129,16 @@ public class CardView extends AppCompatActivity {
         final ModifyCardFragment modify_card = new ModifyCardFragment();
         modify_card.setArguments(bundle);
 
+        /* add_or_subtract:
+        0 = add
+        1 = minus
+        2 = change card name
+         */
         // Set action for adding money
         cardadd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bundle.putBoolean("add_or_subtract", true);
+                bundle.putInt("add_or_subtract", 0);
                 modify_card.show(modify_card_fm, "modify_card");
             }
         });
@@ -141,7 +147,16 @@ public class CardView extends AppCompatActivity {
         cardsubtract.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bundle.putBoolean("add_or_subtract", false);
+                bundle.putInt("add_or_subtract", 1);
+                modify_card.show(modify_card_fm, "modify_card");
+            }
+        });
+
+        // Sets onClickListener for changing cardname
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bundle.putInt("add_or_subtract", 2);
                 modify_card.show(modify_card_fm, "modify_card");
             }
         });

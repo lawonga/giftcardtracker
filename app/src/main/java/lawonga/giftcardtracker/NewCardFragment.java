@@ -63,6 +63,8 @@ public class NewCardFragment extends DialogFragment {
     public static HashMap<String, File> cardMap;
     private boolean picturetaken = false;
     private ArrayList<String> currentOrder;
+    static byte[] bitmapdata;
+    static File file;
 
     @Override
     public void onStart() {
@@ -101,13 +103,12 @@ public class NewCardFragment extends DialogFragment {
                     .setOnSliderClickListener(new BaseSliderView.OnSliderClickListener() {
                         @Override
                         public void onSliderClick(BaseSliderView baseSliderView) {
-                            Toast.makeText(getActivity(), String.valueOf(sliderShow.getCurrentPosition()), Toast.LENGTH_SHORT).show();
                             if (name == "Take Photo" && picturetaken == false) {
                                 captureCameraPhoto();
                             }
                         }
                     });
-            sliderShow.setDuration(Integer.MAX_VALUE);
+            sliderShow.stopAutoCycle();
             sliderShow.setCustomIndicator((PagerIndicator) view.findViewById(R.id.custom_indicator));
             sliderShow.addSlider(textSliderView);
         }
@@ -154,12 +155,18 @@ public class NewCardFragment extends DialogFragment {
      * Converts drawable int [to bitmap and then] to file
      **/
     private File drawableFile(int drawInt, String name) {
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
-                drawInt);
-        File file = new File(getActivity().getCacheDir(), name);
-        FileOutputStream fileOutputStream = null;
+        // new NewCardFragmentAsynctask().execute(drawInt);
+
+        file = new File(getActivity().getCacheDir(), name);
         try {
             file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), drawInt);
+        FileOutputStream fileOutputStream = null;
+        try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
             byte[] bitmapdata = byteArrayOutputStream.toByteArray();
@@ -179,6 +186,8 @@ public class NewCardFragment extends DialogFragment {
                 e.printStackTrace();
             }
         }
+
+
         return file;
     }
 
