@@ -1,22 +1,16 @@
-package lawonga.giftcardtracker;
+package lawonga.giftcardtracker.DialogFragments;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +18,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.daimajia.slider.library.Indicators.PagerIndicator;
@@ -41,7 +34,6 @@ import com.parse.SaveCallback;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -49,6 +41,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import lawonga.giftcardtracker.CardLogic.CardListAdapter;
+import lawonga.giftcardtracker.CardLogic.CardListCreator;
+import lawonga.giftcardtracker.LogInActivity;
+import lawonga.giftcardtracker.R;
 
 /**
  * Created by lawonga on 9/28/2015.
@@ -293,7 +290,7 @@ public class NewCardFragment extends DialogFragment {
         parseObject.put("user", ParseUser.getCurrentUser());
         parseObject.put("cardpicture", parseFile);
         parseObject.put("cardcode", cardcode);
-        parseObject.pinInBackground(String.valueOf(LogonActivity.currentcard), new SaveCallback() {
+        parseObject.pinInBackground(String.valueOf(LogInActivity.currentcard), new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 CardListCreator.cardData.add(new CardListAdapter(nametext, Double.valueOf(initialbalancetext), "", parseObject.getObjectId(), picture, cardcode));

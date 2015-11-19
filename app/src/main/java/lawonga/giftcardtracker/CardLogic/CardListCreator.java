@@ -1,16 +1,17 @@
-package lawonga.giftcardtracker;
+package lawonga.giftcardtracker.CardLogic;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+
+import lawonga.giftcardtracker.CardActivity;
+import lawonga.giftcardtracker.MainViewActivity;
 
 /**
  * Created by lawonga on 9/26/2015.
@@ -23,7 +24,7 @@ import java.util.ArrayList;
  * CardListAdapter places things into the CardData and notifies the list to add the stuff in and update
  */
 public class CardListCreator extends ListFragment {
-    public static CustomAdapter adapter;
+    public static CardListFragment adapter;
     public static ArrayList<CardListAdapter> cardData = new ArrayList<>();
 
     @Override
@@ -32,7 +33,7 @@ public class CardListCreator extends ListFragment {
         // Custom View Layout
         if (adapter == null) {
             CardListAdapter.queryList();
-            adapter = new CustomAdapter(getActivity(), cardData);
+            adapter = new CardListFragment(getActivity(), cardData);
         }
         setListAdapter(adapter);
     }
@@ -72,7 +73,7 @@ public class CardListCreator extends ListFragment {
         }
 
 
-        Intent intent = new Intent(v.getContext(), CardView.class);
+        Intent intent = new Intent(v.getContext(), CardActivity.class);
         intent.putExtra("networkstatus", MainViewActivity.networkStatus);
         intent.putExtra("cardposition", position);
         intent.putExtra("cardbalance", cardbalance);

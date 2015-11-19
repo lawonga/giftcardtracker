@@ -1,4 +1,4 @@
-package lawonga.giftcardtracker;
+package lawonga.giftcardtracker.Logic;
 
 import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
@@ -27,6 +27,7 @@ public class ReusableLogic {
         return intHeight;
     }
 
+    // Calculates width percentage of screen
     public static int widthPercentage(DisplayMetrics displayMetrics){
 
         float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
@@ -37,6 +38,7 @@ public class ReusableLogic {
         return intWidth;
     }
 
+    // Cleans out bitmap
     public void disposeBitmap(Bitmap bitmap){
         if (bitmap != null){
             bitmap.recycle();

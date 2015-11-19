@@ -1,4 +1,4 @@
-package lawonga.giftcardtracker;
+package lawonga.giftcardtracker.CardLogic;
 
 
 import android.content.res.Resources;
@@ -16,11 +16,15 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import lawonga.giftcardtracker.CardActivity;
+import lawonga.giftcardtracker.LogInActivity;
+import lawonga.giftcardtracker.MainViewActivity;
+import lawonga.giftcardtracker.R;
 
 /**
  * Created by lawonga on 9/27/2015.
@@ -61,9 +65,9 @@ public class CardListAdapter {
     }
 
     public static void queryList(){
-        if (LogonActivity.currentcard == 0){
+        if (LogInActivity.currentcard == 0){
             accessdatabase = "DataBase";
-        } else if (LogonActivity.currentcard == 1){
+        } else if (LogInActivity.currentcard == 1){
             accessdatabase = "Archive";
         }
         if (MainViewActivity.networkStatus) {
@@ -74,11 +78,11 @@ public class CardListAdapter {
             } catch (ParseException ignored){}
             cloudQuery(0);
             cloudQuery(1);
-        } else if (!MainViewActivity.networkStatus || !CardView.isNetworkConnected) {
+        } else if (!MainViewActivity.networkStatus || !CardActivity.isNetworkConnected) {
             // IF NOT CONNECTED
             ParseQuery<ParseObject> query = ParseQuery.getQuery(accessdatabase);
             query.orderByAscending("cardname");
-            query.fromPin(String.valueOf(LogonActivity.currentcard));
+            query.fromPin(String.valueOf(LogInActivity.currentcard));
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> list, ParseException e) {
@@ -109,7 +113,7 @@ public class CardListAdapter {
                             CardListCreator.cardData.add(new CardListAdapter(cardnameobject, cardnamebalance, currentCardNotes, objectID, cardPic, cardcode));
                             CardListCreator.notifychangeddata();
                         }
-                        Log.e("Current request", String.valueOf(LogonActivity.currentcard));
+                        Log.e("Current request", String.valueOf(LogInActivity.currentcard));
                     } else {
                         Log.e("Local Datastore", e.toString());
                     }
@@ -131,7 +135,7 @@ public class CardListAdapter {
                 if (e == null) {
                     if (parseObjects.size() != 0 ) MainViewActivity.showIfBlank.setVisibility(View.INVISIBLE);
                     Log.e("ParseObject", parseObjects.toString());
-                    if (cardTarget == LogonActivity.currentcard) {
+                    if (cardTarget == LogInActivity.currentcard) {
                         // Grabs data from the downloaded object
                         for (final ParseObject object : parseObjects) {
                             // PER card has different data, hence why these are placed in here

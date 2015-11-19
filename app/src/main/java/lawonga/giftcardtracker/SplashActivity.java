@@ -7,7 +7,7 @@ import android.os.Bundle;
 /**
  * Created by lawonga on 11/16/2015.
  */
-public class SplashScreen extends Activity {
+public class SplashActivity extends Activity {
     public final int SPLASH_DISPLAY_LENGTH = 500;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +22,7 @@ public class SplashScreen extends Activity {
                 } finally {
                     overridePendingTransition(0, R.anim.fade_out);
                     finish();
-                    Intent splashScreenIntent = new Intent(SplashScreen.this, LogonActivity.class);
+                    Intent splashScreenIntent = new Intent(SplashActivity.this, LogInActivity.class);
                     startActivity(splashScreenIntent);
                 }
             }

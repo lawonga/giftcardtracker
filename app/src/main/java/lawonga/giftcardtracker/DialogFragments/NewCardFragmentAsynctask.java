@@ -1,4 +1,4 @@
-package lawonga.giftcardtracker;
+package lawonga.giftcardtracker.DialogFragments;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;

@@ -1,9 +1,7 @@
-package lawonga.giftcardtracker;
+package lawonga.giftcardtracker.CardLogic;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,14 +12,20 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import lawonga.giftcardtracker.R;
+
 /**
  * Created by lawonga on 9/27/2015.
  */
-public class CustomAdapter extends ArrayAdapter<CardListAdapter> {
-    public CustomAdapter(Context context, ArrayList<CardListAdapter> cardDatas) {
+public class CardListFragment extends ArrayAdapter<CardListAdapter> {
+    public CardListFragment(Context context, ArrayList<CardListAdapter> cardDatas) {
         super(context, 0, cardDatas);
     }
 
+    /* Fragment that holds the individual card; height of card is determined by
+    finding out the current width of the screen and then calculating it by 0.45;
+    that way we get consistency between all devices without having to make
+    multiple layouts */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         CardListAdapter carddatas = getItem(position);
@@ -38,7 +42,7 @@ public class CustomAdapter extends ArrayAdapter<CardListAdapter> {
         cardName.setText(carddatas.cardname);
         cardBalance.setText(Double.toString(carddatas.cardbalance));
 
-
+        // Calculates the current width of the screen, times it by 0.45 to get the card in pixels
         int currentWidth = displayMetrics.widthPixels;
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Integer.valueOf((int) (currentWidth*0.45)));
 

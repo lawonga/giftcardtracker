@@ -1,10 +1,12 @@
-package lawonga.giftcardtracker;
+package lawonga.giftcardtracker.DialogFragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+
+import lawonga.giftcardtracker.CardLogic.CardListCreator;
 
 /**
  * Created by lawonga on 11/7/2015.

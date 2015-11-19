@@ -33,10 +33,15 @@ import com.parse.ParseObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import lawonga.giftcardtracker.CardLogic.CardListAdapter;
+import lawonga.giftcardtracker.CardLogic.CardListCreator;
+import lawonga.giftcardtracker.DialogFragments.ModifyCardFragment;
+import lawonga.giftcardtracker.DialogFragments.NewCardFragment;
+
 /**
  * Created by lawonga on 9/27/2015.
  */
-public class CardView extends AppCompatActivity {
+public class CardActivity extends AppCompatActivity {
     Bitmap cardpicturebmp;
     byte[] cardpicturefile;
     String cardname, cardId, cardNotes, cardcode;
@@ -51,29 +56,6 @@ public class CardView extends AppCompatActivity {
     public static boolean isNetworkConnected;
     public static Toolbar toolbar;
     public static CollapsingToolbarLayout collapsingToolBar;
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        /* Checks to see if we're in archived cards or my cards
-        if LogonActivity.currentcard = 0, then it means we are in my cards
-        if LogonActivity.currentcard = 1, then it means we are in archive
-         */
-        MenuItem archiveMenu = menu.findItem(R.id.archive);
-        MenuItem unarchiveMenu = menu.findItem(R.id.unarchive);
-        if (LogonActivity.currentcard == 1) {
-            archiveMenu.setVisible(false);
-            archiveMenu.setEnabled(false);
-            unarchiveMenu.setVisible(true);
-            unarchiveMenu.setEnabled(true);
-        } else {
-            archiveMenu.setVisible(true);
-            archiveMenu.setEnabled(true);
-            unarchiveMenu.setVisible(false);
-            unarchiveMenu.setEnabled(false);
-        }
-        return true;
-    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,6 +156,37 @@ public class CardView extends AppCompatActivity {
         cardpicture.setImageBitmap(cardpicturebmp);
     }
 
+    /* Checks to see if we're in archived cards or my cards
+    if LogInActivity.currentcard = 1, then it means we are in archive, and sets the menus accordingly
+    if LogInActivity.currentcard = 0, then it means we are in my cards, and sets the menus accordingly
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem archiveMenu = menu.findItem(R.id.archive);
+        MenuItem unarchiveMenu = menu.findItem(R.id.unarchive);
+        if (LogInActivity.currentcard == 1) {
+            archiveMenu.setVisible(false);
+            archiveMenu.setEnabled(false);
+            unarchiveMenu.setVisible(true);
+            unarchiveMenu.setEnabled(true);
+        } else {
+            archiveMenu.setVisible(true);
+            archiveMenu.setEnabled(true);
+            unarchiveMenu.setVisible(false);
+            unarchiveMenu.setEnabled(false);
+        }
+        return true;
+    }
+
+    // Create the options menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.cardview, menu);
+        return true;
+    }
+
+
     /* This method does the option items
     if delete = do a delete card
     if archive = delete the card in DataBase and recreate the card in Archive
@@ -206,11 +219,12 @@ public class CardView extends AppCompatActivity {
         return false;
     }
 
-    // This method is for the deleteCurrentCard
+    /* This method is for the deleteCurrentCard... deletes the card from the cloud
+    if we are connected to the internet. Otherwise deletes the card locally if we are not */
     public void deleteCurrentCard(){
         // Delete card in cloud
         Map<String, Object> map = new HashMap<>();
-        map.put("currentCard", LogonActivity.currentcard);
+        map.put("currentCard", LogInActivity.currentcard);
         map.put("cardId", cardId);
         // Check if network connected before deleting
         if (isNetworkConnected()) {
@@ -263,14 +277,7 @@ public class CardView extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.cardview, menu);
-        return true;
-    }
-
-    // Network state check
+    // Network state check; return true if we're connected to the network
     public boolean isNetworkConnected(){
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();

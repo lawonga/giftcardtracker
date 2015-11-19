@@ -1,4 +1,4 @@
-package lawonga.giftcardtracker;
+package lawonga.giftcardtracker.DialogFragments;
 
 import android.app.DialogFragment;
 import android.content.Context;
@@ -26,6 +26,11 @@ import com.parse.SaveCallback;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import lawonga.giftcardtracker.CardActivity;
+import lawonga.giftcardtracker.CardLogic.CardListAdapter;
+import lawonga.giftcardtracker.CardLogic.CardListCreator;
+import lawonga.giftcardtracker.R;
 
 /**
  * Created by lawonga on 10/24/2015.
@@ -83,9 +88,9 @@ public class ModifyCardFragment extends DialogFragment {
                   }
                   addorsubctract_add.setEnabled(false);
                   if (add_or_subtract == 0 || add_or_subtract == 1) {
-                      cardvalue = Double.valueOf(CardView.cardbalanceview.getText().toString());
+                      cardvalue = Double.valueOf(CardActivity.cardbalanceview.getText().toString());
                       finalcardvalue = cardvalue + finalcardmodifier;
-                      CardView.cardbalanceview.setText(String.valueOf(finalcardvalue));
+                      CardActivity.cardbalanceview.setText(String.valueOf(finalcardvalue));
                       if (isNetworkConnected) {
                           Map<String, Object> map = new HashMap<>(2);
                           map.put("cardmodifier", finalcardmodifier);
@@ -121,7 +126,7 @@ public class ModifyCardFragment extends DialogFragment {
                                   parseObject.saveInBackground(new SaveCallback() {
                                       @Override
                                       public void done(ParseException e) {
-                                          CardView.collapsingToolBar.setTitle(addorsubtract_edittextview.getText().toString());
+                                          CardActivity.collapsingToolBar.setTitle(addorsubtract_edittextview.getText().toString());
                                           CardListCreator.clearadapter();
                                           CardListAdapter.queryList();
                                           dismiss();

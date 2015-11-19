@@ -1,11 +1,11 @@
-package lawonga.giftcardtracker;
+package lawonga.giftcardtracker.CardLogic;
 
 import android.app.Application;
-import android.os.Bundle;
 
 import com.parse.Parse;
 import com.parse.ParseACL;
-import com.parse.ParseUser;
+
+import lawonga.giftcardtracker.Logic.keys;
 
 /**
  * Created by lawonga on 9/28/2015.

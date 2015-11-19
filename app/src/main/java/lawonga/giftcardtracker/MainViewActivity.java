@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
@@ -28,10 +27,13 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toolbar;
 
 import com.github.jlmd.animatedcircleloadingview.AnimatedCircleLoadingView;
-import com.parse.ParseUser;
+
+import lawonga.giftcardtracker.CardLogic.CardListAdapter;
+import lawonga.giftcardtracker.CardLogic.CardListCreator;
+import lawonga.giftcardtracker.DialogFragments.ExitDialogFragment;
+import lawonga.giftcardtracker.DialogFragments.NewCardFragment;
 
 public class MainViewActivity extends AppCompatActivity {
     // Register things
@@ -57,13 +59,6 @@ public class MainViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try{
-            Log.e("cardData", String.valueOf(CardListCreator.cardData));
-            Log.e("adapter", String.valueOf(CardListCreator.adapter));
-            Log.e("listLength", String.valueOf(CardListCreator.cardData.size()));
-        } catch (Exception ignored){}
-
-        Log.e("Class", "Create");
         // Check network status
         networkStatus = isNetworkConnected();
 
@@ -77,7 +72,7 @@ public class MainViewActivity extends AppCompatActivity {
         fab = (FloatingActionButton)findViewById(R.id.fab);
         animatedCircleLoadingView = (AnimatedCircleLoadingView)findViewById(R.id.circle_loading_view);
         showIfBlank = (LinearLayout)findViewById(R.id.showIfBlank);
-        LogonActivity.currentcard = 0;
+        LogInActivity.currentcard = 0;
 
         // Set the Adapter for list View
         mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, mTitle));
@@ -232,6 +227,8 @@ public class MainViewActivity extends AppCompatActivity {
         }
 
     }
+
+    // This is the fragment that is created when the user switches tabs
     public class grabCard extends Fragment{
         public static final String ARG_FRAG_NO = "frag_no";
 
@@ -246,9 +243,9 @@ public class MainViewActivity extends AppCompatActivity {
             String title = getResources().getStringArray(R.array.titles)[i];
             getActivity().setTitle(title);
             if (i==0) {
-                LogonActivity.currentcard = 0;
+                LogInActivity.currentcard = 0;
             } else if (i==1){
-                LogonActivity.currentcard = 1;
+                LogInActivity.currentcard = 1;
             }
             CardListCreator.adapter.clear();
             CardListCreator.adapter = null;

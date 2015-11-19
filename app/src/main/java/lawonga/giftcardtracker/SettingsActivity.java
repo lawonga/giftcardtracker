@@ -31,6 +31,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import lawonga.giftcardtracker.CardLogic.CardListCreator;
+import lawonga.giftcardtracker.Logic.ReusableLogic;
+
 /**
  * Created by lawonga on 9/26/2015.
  */
@@ -65,7 +68,7 @@ public class SettingsActivity extends AppCompatActivity{
         }
         final StableArrayAdapter adapter = new StableArrayAdapter(this, android.R.layout.simple_list_item_1, settinglist);
         settingListView.setAdapter(adapter);
-        final Intent logoutIntent = new Intent(this, LogonActivity.class);
+        final Intent logoutIntent = new Intent(this, LogInActivity.class);
         settingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
@@ -80,7 +83,7 @@ public class SettingsActivity extends AppCompatActivity{
                     changeEmailDialog.show(fragmentManager, "reset_email");
                 }
                 if(position == 3){
-                    Intent intent = new Intent(SettingsActivity.this, Credits.class);
+                    Intent intent = new Intent(SettingsActivity.this, CreditsActivity.class);
                     startActivity(intent);
                 }
                 // Logout code

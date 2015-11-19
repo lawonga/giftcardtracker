@@ -13,9 +13,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by lawonga on 11/17/2015.
  */
-public class Credits extends Activity {
+public class CreditsActivity extends Activity {
     TextView exit;
     CircleImageView andywong, kevinchua;
+
+    /* Activity for our credits screen!
+    Finishes activity whe we click the X on the upper right hand corner
+    Launches the browser to our respective portfolios/websites when we click it */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

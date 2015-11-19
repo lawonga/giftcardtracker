@@ -25,11 +25,13 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.RequestPasswordResetCallback;
 
+import lawonga.giftcardtracker.CardLogic.ParseInitialization;
+
 /**
  * Created by lawonga on 9/28/2015.
  * This is the main login screen, with USER & PASSWORD as well as a forgot password and register button
  */
-public class LogonActivity extends AppCompatActivity {
+public class LogInActivity extends AppCompatActivity {
 
     // Register things
     String passwordtxt, usernametxt;
@@ -53,7 +55,7 @@ public class LogonActivity extends AppCompatActivity {
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
             Log.e("currentuser", currentUser.toString());
-            Intent intent = new Intent(LogonActivity.this, MainViewActivity.class);
+            Intent intent = new Intent(LogInActivity.this, MainViewActivity.class);
             startActivity(intent);
             this.finish();
         }
@@ -73,7 +75,7 @@ public class LogonActivity extends AppCompatActivity {
         registerhere.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplication(), NewUser.class);
+                Intent intent = new Intent(getApplication(), NewUserActivity.class);
                 startActivity(intent);
             }
         });
@@ -104,7 +106,7 @@ public class LogonActivity extends AppCompatActivity {
                         @Override
                         public void done(ParseUser parseUser, ParseException e) {
                             if (parseUser != null) {
-                                Intent intent = new Intent(LogonActivity.this, MainViewActivity.class);
+                                Intent intent = new Intent(LogInActivity.this, MainViewActivity.class);
                                 startActivity(intent);
                                 finish();
                             } else {
@@ -152,7 +154,7 @@ public class LogonActivity extends AppCompatActivity {
                                         dismiss();
                                     } else {
                                         Toast.makeText(getApplication(), "Error. Please enter a valid email address.", Toast.LENGTH_LONG).show();
-                                        LogonActivity.forgotpassword.performClick();
+                                        LogInActivity.forgotpassword.performClick();
                                     }
                                 }
                             });
